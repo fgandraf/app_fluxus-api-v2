@@ -4,7 +4,6 @@ import com.felipegandra.app_fluxusapiv2.config.TokenService;
 import com.felipegandra.app_fluxusapiv2.modules.users.dtos.*;
 import com.felipegandra.app_fluxusapiv2.modules.users.enums.UserRole;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,14 +17,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v2/users")
 public class UserController {
 
-    @Autowired
-    private UserService service;
+    private final UserService service;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private TokenService tokenService;
+    public UserController(UserService service, AuthenticationManager authenticationManager, TokenService tokenService){
+        this.service = service;
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid LoginInput loginInput) {
