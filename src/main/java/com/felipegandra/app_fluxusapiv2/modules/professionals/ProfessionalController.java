@@ -1,12 +1,13 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals;
 
+import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalDetails;
+import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalTagNameId;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("v2/professionals")
@@ -18,6 +19,22 @@ public class ProfessionalController {
         this.service = service;
     }
 
+
+    @GetMapping
+    public ResponseEntity<List<ProfessionalDetails>> getIndex() {
+        return ResponseEntity.ok(service.getProfessionalIndex());
+    }
+
+    @GetMapping("tag-name-id")
+    public ResponseEntity<List<ProfessionalTagNameId>> getTagNameIdIndex() {
+        return ResponseEntity.ok(service.getTagNameId());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Professional> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
     @PostMapping
     public ResponseEntity<Professional> create(@Valid @RequestBody Professional professional) {
         var createdProfessional = service.create(professional);
@@ -26,16 +43,6 @@ public class ProfessionalController {
                 .buildAndExpand(createdProfessional.getId())
                 .toUri();
         return ResponseEntity.created(location).body(createdProfessional);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Professional> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<Professional>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @PutMapping

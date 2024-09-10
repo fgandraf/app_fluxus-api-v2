@@ -1,9 +1,12 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals;
 
 import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalDetails;
+import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalTagNameId;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfessionalService {
@@ -14,12 +17,45 @@ public class ProfessionalService {
         this.repository = professionalRepository;
     }
 
-    public Professional findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Professional", id));
+    public List<ProfessionalDetails> getProfessionalIndex() {
+        return repository.findProfessionalIndex()
+                .stream()
+                .map(result -> new ProfessionalDetails(
+                        (Long) result[0],
+                        (String) result[1],
+                        (String) result[2],
+                        (String) result[3],
+                        (String) result[4]
+                ))
+                .collect(Collectors.toList());
     }
 
-    public Page<Professional> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public List<ProfessionalTagNameId> getTagNameId() {
+
+        return repository.findProfessionalTagNameId()
+                .stream()
+                .map(result -> {
+                    Long id = (Long) result[0];
+                    String tag = (String) result[1];
+                    String profession = (String) result[2];
+                    String name = (String) result[3];
+
+                    String nameId = profession != null ? profession.substring(0, 3) + ". " : "";
+                    String[] nameParts = name.split(" ");
+                    if (nameParts.length > 1) {
+                        nameId += nameParts[0] + " " + nameParts[nameParts.length - 1];
+                    } else {
+                        nameId += name;
+                    }
+
+                    return new ProfessionalTagNameId(id, tag, nameId);
+                    })
+                .collect(Collectors.toList()
+                );
+    }
+
+    public Professional findById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Professional", id));
     }
 
     public Professional create(Professional bankBranch) {

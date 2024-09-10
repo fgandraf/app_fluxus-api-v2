@@ -1,6 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals;
 
-import com.felipegandra.app_fluxusapiv2.modules.orders.Order;
+import com.felipegandra.app_fluxusapiv2.modules.Xorders.Order;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
