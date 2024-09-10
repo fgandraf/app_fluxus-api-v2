@@ -1,4 +1,4 @@
-package com.felipegandra.app_fluxusapiv2.modules.bankBranches;
+package com.felipegandra.app_fluxusapiv2.modules.branches;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -9,38 +9,38 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("v2/bank-branches")
-public class BankBranchController {
+@RequestMapping("v2/branches")
+public class BranchController {
 
-    private final BankBranchService service;
+    private final BranchService service;
 
-    public BankBranchController(BankBranchService service) {
+    public BranchController(BranchService service) {
         this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<BankBranch> create(@Valid @RequestBody BankBranch bankBranch) {
-        BankBranch createdBankBranch = service.create(bankBranch);
+    public ResponseEntity<Branch> create(@Valid @RequestBody Branch branch) {
+        Branch createdBranch = service.create(branch);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(createdBankBranch.getId())
+                .buildAndExpand(createdBranch.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(createdBankBranch);
+        return ResponseEntity.created(location).body(createdBranch);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BankBranch> getById(@PathVariable Long id) {
+    public ResponseEntity<Branch> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping
-    public ResponseEntity<Page<BankBranch>> getAll(Pageable pageable) {
+    public ResponseEntity<Page<Branch>> getAll(Pageable pageable) {
         return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @PutMapping
-    public ResponseEntity<BankBranch> update(@RequestBody BankBranch bankBranch) {
-        return ResponseEntity.ok(service.update(bankBranch));
+    public ResponseEntity<Branch> update(@RequestBody Branch branch) {
+        return ResponseEntity.ok(service.update(branch));
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.invoices;
 
-import com.felipegandra.app_fluxusapiv2.modules._domain.serviceOrders.ServiceOrder;
+import com.felipegandra.app_fluxusapiv2.modules.orders.Order;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,5 +35,5 @@ public class Invoice
     public Double total;
 
     @OneToMany(mappedBy = "invoice")
-    private List<ServiceOrder> serviceOrders;
+    private List<Order> orders;
 }

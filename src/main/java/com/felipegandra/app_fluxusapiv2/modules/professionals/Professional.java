@@ -1,6 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals;
 
-import com.felipegandra.app_fluxusapiv2.modules._domain.serviceOrders.ServiceOrder;
+import com.felipegandra.app_fluxusapiv2.modules.orders.Order;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,5 +36,5 @@ public class Professional
     public String email;
 
     @OneToMany(mappedBy = "professional")
-    private List<ServiceOrder> serviceOrders;
+    private List<Order> orders;
 }

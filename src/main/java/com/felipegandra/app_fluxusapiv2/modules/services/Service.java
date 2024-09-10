@@ -1,6 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.services;
 
-import com.felipegandra.app_fluxusapiv2.modules._domain.serviceOrders.ServiceOrder;
+import com.felipegandra.app_fluxusapiv2.modules.orders.Order;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,5 +30,5 @@ public class Service
     public Double mileageAllowance;
 
     @OneToMany(mappedBy = "service")
-    private List<ServiceOrder> serviceOrders;
+    private List<Order> orders;
 }
