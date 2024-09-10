@@ -1,9 +1,12 @@
 package com.felipegandra.app_fluxusapiv2.modules.branches;
 
 import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BranchService {
@@ -14,12 +17,26 @@ public class BranchService {
         this.repository = repository;
     }
 
-    public Branch findById(Long id) {
+    public List<BranchDetails> getBranchIndex() {
+        var results = repository.findBranchIndex();
+
+        return results.stream()
+                .map(result -> new BranchDetails(
+                        (String) result[0],
+                        (String) result[1],
+                        (String) result[2],
+                        (String) result[3],
+                        (String) result[4]
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public Branch findById(String id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Branch", id));
     }
 
-    public Page<Branch> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Optional<BranchDetails> getBranchDetailsById(String branchId) {
+        return repository.findBranchDetailsById(branchId);
     }
 
     public Branch create(Branch branch) {
@@ -38,7 +55,7 @@ public class BranchService {
                 );
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         var branch = repository.findById(id).orElseThrow(() -> new NotFoundException("Branch", id));
         repository.delete(branch);
     }

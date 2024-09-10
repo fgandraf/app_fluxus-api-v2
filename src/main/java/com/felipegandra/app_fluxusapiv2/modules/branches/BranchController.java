@@ -1,12 +1,13 @@
 package com.felipegandra.app_fluxusapiv2.modules.branches;
 
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchDetails;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("v2/branches")
@@ -16,6 +17,22 @@ public class BranchController {
 
     public BranchController(BranchService service) {
         this.service = service;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<BranchDetails>> getIndex() {
+        return ResponseEntity.ok(service.getBranchIndex());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Branch> getById(@PathVariable String id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
+
+    @GetMapping("contacts/{branchId}")
+    public Optional<BranchDetails> getDetailsById(@PathVariable String branchId) {
+        return service.getBranchDetailsById(branchId);
     }
 
     @PostMapping
@@ -28,23 +45,13 @@ public class BranchController {
         return ResponseEntity.created(location).body(createdBranch);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Branch> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<Branch>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findAll(pageable));
-    }
-
     @PutMapping
     public ResponseEntity<Branch> update(@RequestBody Branch branch) {
         return ResponseEntity.ok(service.update(branch));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

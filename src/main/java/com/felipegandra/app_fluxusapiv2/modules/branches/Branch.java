@@ -19,9 +19,7 @@ public class Branch {
 
     @Id
     @Column(name = "branch_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BRANCH")
-    @SequenceGenerator(name = "SEQ_BRANCH", sequenceName = "SEQ_BRANCH", allocationSize = 1)
-    public Long id;
+    public String id;
 
     @NotNull
     public String name;
@@ -48,7 +46,7 @@ public class Branch {
     @OneToMany(mappedBy = "branch")
     private List<Order> orders;
 
-    public Branch(Long id, String name, String address, String complement, String district, String city, String zip, String state, String contactName, String phone1, String phone2, String email) {
+    public Branch(String id, String name, String address, String complement, String district, String city, String zip, String state, String contactName, String phone1, String phone2, String email) {
         this.id = id;
         this.name = name;
         this.address = address;
