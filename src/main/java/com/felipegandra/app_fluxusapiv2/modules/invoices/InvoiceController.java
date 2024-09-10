@@ -1,12 +1,12 @@
 package com.felipegandra.app_fluxusapiv2.modules.invoices;
 
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("v2/invoices")
@@ -15,6 +15,16 @@ public class InvoiceController {
 
     public InvoiceController(InvoiceService service) {
         this.service = service;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Invoice>> getAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+
+    @GetMapping("/description/{id}")
+    public ResponseEntity<Optional<String>> getDescription(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getDescription(id));
     }
 
     @PostMapping
@@ -27,19 +37,12 @@ public class InvoiceController {
         return ResponseEntity.created(location).body(createdInvoice);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Invoice> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
-    }
+    @PutMapping("totals")
+    public ResponseEntity<Boolean> putTotals(@RequestBody Invoice invoice) {
+        if (service.updateTotal(invoice) == 0)
+            return ResponseEntity.ok(false);
 
-    @GetMapping
-    public ResponseEntity<Page<Invoice>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findAll(pageable));
-    }
-
-    @PutMapping
-    public ResponseEntity<Invoice> update(@RequestBody Invoice invoice) {
-        return ResponseEntity.ok(service.update(invoice));
+        return ResponseEntity.ok(true);
     }
 
     @DeleteMapping("/{id}")

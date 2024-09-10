@@ -3,7 +3,6 @@ package com.felipegandra.app_fluxusapiv2.modules.branches;
 import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchDetails;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,9 +17,8 @@ public class BranchService {
     }
 
     public List<BranchDetails> getBranchIndex() {
-        var results = repository.findBranchIndex();
-
-        return results.stream()
+        return repository.findBranchIndex()
+                .stream()
                 .map(result -> new BranchDetails(
                         (String) result[0],
                         (String) result[1],
