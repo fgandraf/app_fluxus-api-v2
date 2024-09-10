@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("v2/services")
@@ -18,6 +19,16 @@ public class ServiceController {
         this.serviceService = service;
     }
 
+    @GetMapping
+    public ResponseEntity<List<Service>> getAll() {
+        return ResponseEntity.ok(serviceService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Service> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(serviceService.findById(id));
+    }
+
     @PostMapping
     public ResponseEntity<Service> create(@Valid @RequestBody Service service) {
         var createdService = serviceService.create(service);
@@ -26,16 +37,6 @@ public class ServiceController {
                 .buildAndExpand(createdService.getId())
                 .toUri();
         return ResponseEntity.created(location).body(createdService);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Service> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(serviceService.findById(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<Service>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(serviceService.findAll(pageable));
     }
 
     @PutMapping

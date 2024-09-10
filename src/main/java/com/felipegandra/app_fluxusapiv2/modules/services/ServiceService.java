@@ -1,9 +1,9 @@
 package com.felipegandra.app_fluxusapiv2.modules.services;
 
 import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ServiceService {
@@ -18,8 +18,8 @@ public class ServiceService {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Service", id));
     }
 
-    public Page<com.felipegandra.app_fluxusapiv2.modules.services.Service> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public List<com.felipegandra.app_fluxusapiv2.modules.services.Service> findAll() {
+        return repository.findAll();
     }
 
     public com.felipegandra.app_fluxusapiv2.modules.services.Service create(com.felipegandra.app_fluxusapiv2.modules.services.Service service) {
