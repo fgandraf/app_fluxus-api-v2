@@ -24,7 +24,7 @@ public class User implements UserDetails {
     public Long id;
 
     @Column(name = "professional_id")
-    public Integer professionalId;
+    public Long professionalId;
 
     @Column(name = "technician_responsible")
     public Boolean technicianResponsible;

@@ -29,7 +29,6 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid LoginInput loginInput) {
-
         var usernamePassword = new UsernamePasswordAuthenticationToken(
                 loginInput.email(),
                 loginInput.password()
@@ -37,15 +36,26 @@ public class UserController {
 
         var auth = authenticationManager.authenticate(usernamePassword);
         var user = (User)auth.getPrincipal();
-
         var token = tokenService.generateToken(user);
+
         return ResponseEntity.ok(new LoginOutput(token));
+    }
+
+    @GetMapping("/username/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserOutput getByUsername(@PathVariable String username) {
+        return new UserOutput(service.findByEmail(username));
+    }
+
+    @GetMapping("/professional/{professionalId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserOutput getByProfessionalId(@PathVariable Long professionalId) {
+        return new UserOutput(service.findById(professionalId));
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UserOutput register(@RequestBody @Valid UserRegisterInput userRegisterInput) {
-
         var user = new User();
         user.setTechnicianResponsible(false);
         user.setLegalResponsible(false);
@@ -55,6 +65,27 @@ public class UserController {
         user.setRole(UserRole.USER);
 
         return service.save(user);
+    }
+
+    @PutMapping("/update-info")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public UserOutput updateInfo(@RequestBody @Valid UserInfoUpdateInput userInfoUpdateInput) {
+        var user = service.findById(userInfoUpdateInput.id());
+        user.setEmail(userInfoUpdateInput.email());
+        user.setPassword(userInfoUpdateInput.userPassword());
+
+        return service.update(user);
+    }
+
+    @PutMapping("/update-config")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public UserOutput updateConfig(@RequestBody @Valid UserConfigUpdateInput userConfigUpdateInput) {
+        var user = service.findById(userConfigUpdateInput.id());
+        user.setProfessionalId(userConfigUpdateInput.professionalId());
+        user.setLegalResponsible(userConfigUpdateInput.legalResponsible());
+        user.setTechnicianResponsible(userConfigUpdateInput.technicianResponsible());
+
+        return service.update(user);
     }
 
     @PutMapping("/activate/{id}")
@@ -69,19 +100,6 @@ public class UserController {
     public ResponseEntity deactivate(@PathVariable Long id) {
         var user = service.deactivate(id);
         return ResponseEntity.ok(user);
-    }
-
-    @PutMapping("/update-info")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserOutput updateInfo(@RequestBody @Valid UserInfoUpdateInput userInfoUpdateInput) {
-
-        var user = service.findById(userInfoUpdateInput.id());
-        user.setEmail(userInfoUpdateInput.email());
-        user.setPassword(userInfoUpdateInput.userPassword());
-        user.setLegalResponsible(userInfoUpdateInput.legalResponsible());
-        user.setTechnicianResponsible(userInfoUpdateInput.technicianResponsible());
-
-        return service.update(user);
     }
 
     @PutMapping("/upgrade-permission/{id}")
@@ -102,12 +120,6 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserOutput getById(@PathVariable Long id) {
         return new UserOutput(service.findById(id));
-    }
-
-    @GetMapping("/email/{email}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserOutput getByUsername(@PathVariable String email) {
-        return new UserOutput(service.findByEmail(email));
     }
 
     @GetMapping

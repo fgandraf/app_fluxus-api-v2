@@ -14,10 +14,6 @@ public record UserInfoUpdateInput(
 
         @NotBlank(message = "Password is required!")
         @Size(min = 6, max = 20, message = "Password must be between 6 -20  characters")
-        String userPassword,
-
-        Boolean technicianResponsible,
-
-        Boolean legalResponsible
+        String userPassword
 ) {
 }

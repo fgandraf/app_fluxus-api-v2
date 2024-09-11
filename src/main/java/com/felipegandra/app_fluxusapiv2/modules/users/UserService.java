@@ -4,7 +4,6 @@ import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.users.dtos.UserOutput;
 import com.felipegandra.app_fluxusapiv2.modules.users.enums.UserRole;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,8 +17,45 @@ import java.util.Optional;
 @Service
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
+
+
+
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return repository.findByEmail(email);
+    }
+
+    public User findByEmail(String email) {
+        var userDetail = repository.findByEmail(email);
+        if (userDetail != null) {
+            var user = new User();
+            BeanUtils.copyProperties(userDetail, user);
+            return user;
+        } else {
+            throw new NotFoundException("User", email);
+        }
+    }
+
+
+
+
+
+    public User findByProfessionalId(Long professionalId) {
+        var userDetail = repository.findByProfessionalId(professionalId);
+        if (userDetail != null) {
+            var user = new User();
+            BeanUtils.copyProperties(userDetail, user);
+            return user;
+        } else {
+            throw new NotFoundException("User", professionalId);
+        }
+    }
 
     public UserOutput save(User user) {
         return new UserOutput(repository.save(user));
@@ -31,10 +67,15 @@ public class UserService implements UserDetailsService {
         return new UserOutput(repository.save(user));
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return repository.findByEmail(email);
-    }
+
+
+
+
+
+
+
+
+
 
     public User activate(Long id) {
         Optional<User> user = repository.findById(id);
@@ -65,16 +106,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User findByEmail(String email) {
-        var userDetail = repository.findByEmail(email);
-        if (userDetail != null) {
-            var user = new User();
-            BeanUtils.copyProperties(userDetail, user);
-            return user;
-        } else {
-            throw new NotFoundException("User", email);
-        }
-    }
+
 
     public User upgradePermission(Long id) {
         Optional<User> user = repository.findById(id);
