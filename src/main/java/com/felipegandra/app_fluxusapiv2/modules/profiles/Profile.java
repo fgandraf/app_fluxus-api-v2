@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,8 +18,6 @@ public class Profile
 {
     @Id
     @Column(name = "profile_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_PROFILE")
-    @SequenceGenerator(name = "SEQ_PROFILE", sequenceName = "SEQ_PROFILE", allocationSize = 1)
     public Long id;
 
     public String cnpj;
@@ -42,7 +42,7 @@ public class Profile
     public String state;
 
     @Column(name = "establishment_date")
-    public LocalDateTime establishmentDate;
+    public LocalDate establishmentDate;
 
     @Size(max = 11)
     public String phone1;
@@ -77,11 +77,11 @@ public class Profile
     public String contractNumber;
 
     @Column(name = "contract_established")
-    public LocalDateTime contractEstablished;
+    public LocalDate contractEstablished;
 
     @Column(name = "contract_start")
-    public LocalDateTime contractStart;
+    public LocalDate contractStart;
 
     @Column(name = "contract_end")
-    public LocalDateTime contractEnd;
+    public LocalDate contractEnd;
 }
