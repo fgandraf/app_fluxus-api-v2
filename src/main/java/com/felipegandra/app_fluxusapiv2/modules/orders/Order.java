@@ -1,6 +1,7 @@
 package com.felipegandra.app_fluxusapiv2.modules.orders;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.felipegandra.app_fluxusapiv2.modules.branches.Branch;
 import com.felipegandra.app_fluxusapiv2.modules.orders.enums.Status;
 import com.felipegandra.app_fluxusapiv2.modules.invoices.Invoice;
@@ -10,7 +11,8 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "tbl_order")
@@ -33,20 +35,35 @@ public class Order
     @JoinColumn(name = "branch_id")
     public Branch branch;
 
-    @Column(name = "order_date")
-    public LocalDateTime orderDate;
+    @JsonProperty("branch_id")
+    public String getBranchId() {
+        return branch != null ? branch.getId() : null;
+    }
 
-    public LocalDateTime deadline;
+    @Column(name = "order_date")
+    public LocalDate orderDate;
+
+    public LocalDate deadline;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "professional_id")
     public Professional professional;
 
+    @JsonProperty("professional_id")
+    public Long getProfessionalId() {
+        return professional != null ? professional.getId() : null;
+    }
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "service_id")
     public Service service;
+
+    @JsonProperty("service_id")
+    public Long getServiceId() {
+        return service != null ? service.getId() : null;
+    }
 
     @Column(name = "service_amount")
     public Double serviceAmount;
@@ -69,17 +86,19 @@ public class Order
 
     public String coordinates;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     public Status status;
 
     @Column(name = "pending_date")
-    public LocalDateTime pendingDate;
+    public LocalDate pendingDate;
 
     @Column(name = "survey_date")
-    public LocalDateTime surveyDate;
+    public LocalDate surveyDate;
 
     @Column(name = "done_date")
-    public LocalDateTime doneDate;
+    public LocalDate doneDate;
+
+    public String comments;
 
     public Boolean invoiced;
 
@@ -87,4 +106,5 @@ public class Order
     @ManyToOne
     @JoinColumn(name = "invoice_id")
     public Invoice invoice;
+
 }

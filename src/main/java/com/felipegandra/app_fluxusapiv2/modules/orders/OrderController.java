@@ -1,12 +1,12 @@
 package com.felipegandra.app_fluxusapiv2.modules.orders;
 
+import com.felipegandra.app_fluxusapiv2.modules.orders.dtos.*;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("v2/orders")
@@ -17,8 +17,43 @@ public class OrderController {
         this.service = service;
     }
 
+    @GetMapping("/flow")
+    public ResponseEntity<List<OrderFlowOutput>> getFlow() {
+        return ResponseEntity.ok(service.findFlow());
+    }
+
+    @GetMapping("/cities")
+    public ResponseEntity<List<String>> getCities() {
+        return ResponseEntity.ok(service.findCities());
+    }
+
+    @GetMapping("/done-to-invoice")
+    public ResponseEntity<List<OrderDoneToInvoice>> getDoneToInvoice() {
+        return ResponseEntity.ok(service.findDoneToInvoice());
+    }
+
+//    TO DO:
+//    [HttpGet("filtered/{filter}")]
+//    public async Task<IActionResult> GetFiltered(string filter)
+
+    @GetMapping("/invoiced/{invoiceId}")
+    public ResponseEntity<List<OrderInvoiced>> getInvoiced(@PathVariable Long invoiceId) {
+        return ResponseEntity.ok(service.findInvoiced(invoiceId));
+    }
+
+    @GetMapping("/professionals/{invoiceId}")
+    public ResponseEntity<List<ProfessionalNameId>> getProfessionalsByInvoiceId(@PathVariable Long invoiceId) {
+        return ResponseEntity.ok(service.findProfessional(invoiceId));
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
     @PostMapping
-    public ResponseEntity<Order> create(@Valid @RequestBody Order order) {
+    public ResponseEntity<Order> create(@Valid @RequestBody OrderCreateInput order) {
         var createdOrder = service.create(order);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -27,19 +62,21 @@ public class OrderController {
         return ResponseEntity.created(location).body(createdOrder);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Order> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<Order>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findAll(pageable));
-    }
-
     @PutMapping
     public ResponseEntity<Order> update(@RequestBody Order order) {
         return ResponseEntity.ok(service.update(order));
+    }
+
+    @PutMapping("update-invoice/{invoiceId}")
+    public ResponseEntity updateToInvoice(@PathVariable Long invoiceId, @RequestBody List<Long> orders) {
+        service.updateToInvoice(invoiceId, orders);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("update-status/{orderId},{status}")
+    public ResponseEntity updateStatus(@PathVariable Long orderId, @PathVariable int status) {
+        service.updateStatus(orderId, status);
+        return ResponseEntity.accepted().build();
     }
 
     @DeleteMapping("/{id}")
