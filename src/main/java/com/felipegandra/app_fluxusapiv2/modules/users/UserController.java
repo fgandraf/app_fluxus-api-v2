@@ -27,7 +27,7 @@ public class UserController {
         this.tokenService = tokenService;
     }
 
-    @PostMapping("/login")
+    @PostMapping("login")
     public ResponseEntity login(@RequestBody @Valid LoginInput loginInput) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(
                 loginInput.email(),
@@ -50,7 +50,7 @@ public class UserController {
     @GetMapping("/professional/{professionalId}")
     @ResponseStatus(HttpStatus.OK)
     public UserOutput getByProfessionalId(@PathVariable Long professionalId) {
-        return new UserOutput(service.findById(professionalId));
+        return new UserOutput(service.findByProfessionalId(professionalId));
     }
 
     @PostMapping("/register")
@@ -116,7 +116,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserOutput getById(@PathVariable Long id) {
         return new UserOutput(service.findById(id));

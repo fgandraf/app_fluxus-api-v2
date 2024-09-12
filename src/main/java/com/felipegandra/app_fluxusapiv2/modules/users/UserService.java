@@ -23,14 +23,6 @@ public class UserService implements UserDetailsService {
         this.repository = repository;
     }
 
-
-
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return repository.findByEmail(email);
-    }
-
     public User findByEmail(String email) {
         var userDetail = repository.findByEmail(email);
         if (userDetail != null) {
@@ -42,10 +34,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-
-
-
-
     public User findByProfessionalId(Long professionalId) {
         var userDetail = repository.findByProfessionalId(professionalId);
         if (userDetail != null) {
@@ -53,9 +41,27 @@ public class UserService implements UserDetailsService {
             BeanUtils.copyProperties(userDetail, user);
             return user;
         } else {
-            throw new NotFoundException("User", professionalId);
+            throw new NotFoundException("Professional", professionalId);
         }
     }
+
+
+
+
+
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return repository.findByEmail(email);
+    }
+
+
+
+
+
+
+
+
 
     public UserOutput save(User user) {
         return new UserOutput(repository.save(user));
