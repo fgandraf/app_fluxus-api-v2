@@ -4,6 +4,7 @@ import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.LogoViewModel;
 import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.ProfileToPrintModel;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
