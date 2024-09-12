@@ -107,4 +107,9 @@ public class Order
     @JoinColumn(name = "invoice_id")
     public Invoice invoice;
 
+    @JsonProperty("invoice_id")
+    public Long getInvoiceId() {
+        return invoice != null ? invoice.getId() : null;
+    }
+
 }

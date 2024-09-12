@@ -8,7 +8,6 @@ import com.felipegandra.app_fluxusapiv2.modules.invoices.InvoiceRepository;
 import com.felipegandra.app_fluxusapiv2.modules.professionals.ProfessionalRepository;
 import com.felipegandra.app_fluxusapiv2.modules.services.ServiceRepository;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
@@ -100,16 +99,48 @@ public class OrderService {
         return orders;
     }
 
+    public List<OrderFiltered> findFiltered(String filter){
 
+        var filters = filter.split(",");
+        var professional = filters[0];
+        var service = filters[1];
+        var city = filters[2];
+        var status = Integer.parseInt(filters[3]);
+        var invoiced = Integer.parseInt(filters[4]);
+        List<OrderFiltered> orders = new ArrayList<>();
 
+        orderRepository.findFiltered(professional, service, city, status, invoiced)
+                .forEach(result -> {
+                    var idResult = (Long) result[0];
+                    var statusResult = (int) result[1];
+                    var professionalResult = (String) result[2];
+                    var orderDateResult = ((Timestamp) result[3]).toLocalDateTime().toLocalDate();
+                    var referenceCodeResult = (String) result[4];
+                    var serviceResult = (String) result[5];
+                    var cityResult = (String) result[6];
+                    var customerNameResult = (String) result[7];
+                    var surveyDateResult = ((Timestamp) result[8]).toLocalDateTime().toLocalDate();
+                    var doneDateResult = ((Timestamp) result[9]).toLocalDateTime().toLocalDate();
+                    var invoicedResult = (int) result[10];
 
+                    orders.add(new OrderFiltered(
+                            idResult,
+                            statusResult,
+                            professionalResult,
+                            orderDateResult,
+                            referenceCodeResult,
+                            serviceResult,
+                            cityResult,
+                            customerNameResult,
+                            surveyDateResult,
+                            doneDateResult,
+                            invoicedResult > 0
+                            )
+                    );
+                });
 
-    //TO DO:
-    // getFiltered
-
-
-
-
+        return orders;
+    }
 
     public List<OrderInvoiced> findInvoiced(Long invoiceId){
 
@@ -212,35 +243,43 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public Order update(Order order){
+    public Order update(OrderUpdateInput order){
+
+        var branch = branchRepository.findById(order.branchId()).orElseThrow(() -> new NotFoundException("Branch", order.branchId()));
+        var service = serviceRepository.findById(order.serviceId()).orElseThrow(() -> new NotFoundException("Service", order.serviceId()));
+        var professional = professionalRepository.findById(order.professionalId()).orElseThrow(() -> new NotFoundException("Professional", order.professionalId()));
+        var invoice = invoiceRepository.findById(order.invoiceId()).orElseThrow(() -> new NotFoundException("Invoice", order.invoiceId()));
+
         return orderRepository
-                .findById(order.getId())
+                .findById(order.orderId())
                 .map(foundOrder -> {
-                    foundOrder.setReferenceCode(order.getReferenceCode());
-                    foundOrder.setBranch(order.getBranch());
-                    foundOrder.setOrderDate(order.getOrderDate());
-                    foundOrder.setDeadline(order.getDeadline());
-                    foundOrder.setProfessional(order.getProfessional());
-                    foundOrder.setService(order.getService());
-                    foundOrder.setServiceAmount(order.getServiceAmount());
-                    foundOrder.setMileageAllowance(order.getMileageAllowance());
-                    foundOrder.setSiopi(order.getSiopi());
-                    foundOrder.setCustomerName(order.getCustomerName());
-                    foundOrder.setCity(order.getCity());
-                    foundOrder.setContactName(order.getContactName());
-                    foundOrder.setContactPhone(order.getContactPhone());
-                    foundOrder.setCoordinates(order.getCoordinates());
-                    foundOrder.setStatus(order.getStatus());
-                    foundOrder.setPendingDate(order.getPendingDate());
-                    foundOrder.setSurveyDate(order.getSurveyDate());
-                    foundOrder.setDoneDate(order.getDoneDate());
-                    foundOrder.setInvoiced(order.getInvoiced());
-                    foundOrder.setInvoice(order.getInvoice());
+                    foundOrder.setReferenceCode(order.referenceCode());
+                    foundOrder.setBranch(branch);
+                    foundOrder.setOrderDate(order.orderDate());
+                    foundOrder.setDeadline(order.deadline());
+                    foundOrder.setProfessional(professional);
+                    foundOrder.setService(service);
+                    foundOrder.setServiceAmount(order.serviceAmount());
+                    foundOrder.setMileageAllowance(order.mileageAllowance());
+                    foundOrder.setSiopi(order.siopi());
+                    foundOrder.setCustomerName(order.customerName());
+                    foundOrder.setCity(order.city());
+                    foundOrder.setContactName(order.contactName());
+                    foundOrder.setContactPhone(order.contactPhone());
+                    foundOrder.setCoordinates(order.coordinates());
+                    foundOrder.setStatus(Status.fromInt(order.status()));
+                    foundOrder.setPendingDate(order.pendingDate());
+                    foundOrder.setSurveyDate(order.surveyDate());
+                    foundOrder.setDoneDate(order.doneDate());
+                    foundOrder.setInvoiced(order.invoiced());
+                    foundOrder.setInvoice(invoice);
+
                     return orderRepository.save(foundOrder);
                 })
                 .orElseThrow(() ->
-                        new NotFoundException("Order", order.getId())
+                        new NotFoundException("Order", order.orderId())
                 );
+
     }
 
     public void updateToInvoice(Long invoiceId, List<Long> orders){

@@ -3,7 +3,6 @@ package com.felipegandra.app_fluxusapiv2.modules.orders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository
@@ -25,9 +24,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "ORDER BY ord.ORDER_DATE", nativeQuery = true)
     List<Object[]> findDoneToInvoice();
 
-
-    //getFiltered
-
+    @Query(value = "SELECT ord.ORDER_ID, ord.STATUS, pro.TAG AS PROFESSIONAL, ord.ORDER_DATE, ord.REFERENCE_CODE, ser.TAG AS SERVICE, ord.CITY, ord.CUSTOMER_NAME, ord.SURVEY_DATE, ord.DONE_DATE, ord.INVOICED  " +
+            "FROM TBL_ORDER ord " +
+            "INNER JOIN TBL_SERVICE ser ON ser.SERVICE_ID = ord.SERVICE_ID " +
+            "INNER JOIN TBL_PROFESSIONAL pro ON ord.PROFESSIONAL_ID = pro.PROFESSIONAL_ID " +
+            "WHERE pro.TAG LIKE :professionalTag AND ser.TAG LIKE :serviceTag AND ord.CITY LIKE :orderCity AND ord.STATUS LIKE :orderStatus AND ord.INVOICED LIKE :orderInvoiced "  +
+            "ORDER BY ord.ORDER_DATE", nativeQuery = true)
+    List<Object[]> findFiltered(String professionalTag, String serviceTag, String orderCity, int orderStatus, int orderInvoiced);
 
     @Query(value = "SELECT ord.ORDER_ID, ord.ORDER_DATE, ord.REFERENCE_CODE, ord.PROFESSIONAL_ID, pro.TAG as PROFESSIONAL, ser.TAG as SERVICE, ord.CITY, ord.CUSTOMER_NAME, ord.SURVEY_DATE, ord.DONE_DATE, ord.INVOICE_ID, ord.SERVICE_AMOUNT, ord.MILEAGE_ALLOWANCE  " +
             "FROM TBL_ORDER ord " +
@@ -36,7 +39,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "WHERE ord.INVOICE_ID = :invoiceId " +
             "ORDER BY ord.DONE_DATE", nativeQuery = true)
     List<Object[]> findInvoiced(Long invoiceId);
-
 
     @Query(value = "SELECT DISTINCT ord.PROFESSIONAL_ID, pro.PROFESSION, pro.NAME  " +
             "FROM TBL_ORDER ord " +

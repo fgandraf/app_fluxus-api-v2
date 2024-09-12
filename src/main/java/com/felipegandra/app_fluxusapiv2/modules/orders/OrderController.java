@@ -32,9 +32,10 @@ public class OrderController {
         return ResponseEntity.ok(service.findDoneToInvoice());
     }
 
-//    TO DO:
-//    [HttpGet("filtered/{filter}")]
-//    public async Task<IActionResult> GetFiltered(string filter)
+    @GetMapping("/filtered/{filter}")
+    public ResponseEntity<List<OrderFiltered>> getFiltered(@PathVariable String filter) {
+        return ResponseEntity.ok(service.findFiltered(filter));
+    }
 
     @GetMapping("/invoiced/{invoiceId}")
     public ResponseEntity<List<OrderInvoiced>> getInvoiced(@PathVariable Long invoiceId) {
@@ -45,7 +46,6 @@ public class OrderController {
     public ResponseEntity<List<ProfessionalNameId>> getProfessionalsByInvoiceId(@PathVariable Long invoiceId) {
         return ResponseEntity.ok(service.findProfessional(invoiceId));
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Order> getById(@PathVariable Long id) {
@@ -63,7 +63,7 @@ public class OrderController {
     }
 
     @PutMapping
-    public ResponseEntity<Order> update(@RequestBody Order order) {
+    public ResponseEntity<Order> update(@RequestBody OrderUpdateInput order) {
         return ResponseEntity.ok(service.update(order));
     }
 
