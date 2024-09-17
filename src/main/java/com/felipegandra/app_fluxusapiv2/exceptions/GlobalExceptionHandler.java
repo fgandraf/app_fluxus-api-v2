@@ -13,6 +13,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(DatabaseOperationException.class)
+    public ResponseEntity<String> handleDatabaseOperationException(DatabaseOperationException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(InvoiceNotFoundException.class)
     public ResponseEntity<String> handleInvoiceNotFoundException(InvoiceNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
