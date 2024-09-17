@@ -37,4 +37,15 @@ public class Invoice
 
     @OneToMany(mappedBy = "invoice")
     private List<Order> orders;
+
+    public Invoice(Long id, String description, LocalDateTime issueDate, Double subtotalService, Double subtotalMileage, Double total) {
+        this.id = id;
+        this.description = description;
+        this.issueDate = issueDate;
+        this.subtotalService = subtotalService;
+        this.subtotalMileage = subtotalMileage;
+        this.total = total;
+    }
+
+    public Invoice(){}
 }

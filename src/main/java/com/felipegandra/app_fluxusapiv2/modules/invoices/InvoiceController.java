@@ -1,13 +1,16 @@
 package com.felipegandra.app_fluxusapiv2.modules.invoices;
 
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceCreateRequest;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceDescriptionResponse;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceResponse;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceUpdateRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("v2/invoices")
@@ -19,34 +22,36 @@ public class InvoiceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Invoice>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<InvoiceResponse>> getAll() {
+        var response = service.findAll();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/description/{id}")
-    public ResponseEntity<Optional<String>> getDescription(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getDescription(id));
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<InvoiceDescriptionResponse> getDescription(@PathVariable Long id) {
+         var response = service.getDescription(id);
+         return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<Invoice> create(@Valid @RequestBody Invoice invoice) {
-        var createdInvoice = service.create(invoice);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(createdInvoice.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(createdInvoice);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<InvoiceResponse> create(@Valid @RequestBody InvoiceCreateRequest request) {
+        var response = service.create(request);
+        var location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("totals")
-    public ResponseEntity<Boolean> putTotals(@RequestBody Invoice invoice) {
-        if (service.updateTotal(invoice) == 0)
-            return ResponseEntity.ok(false);
-
-        return ResponseEntity.ok(true);
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<InvoiceResponse> putTotals(@Valid @RequestBody InvoiceUpdateRequest request) {
+        var response = service.updateTotal(request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

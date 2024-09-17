@@ -1,44 +1,84 @@
 package com.felipegandra.app_fluxusapiv2.modules.invoices;
 
+import com.felipegandra.app_fluxusapiv2.exceptions.DatabaseOperationException;
 import com.felipegandra.app_fluxusapiv2.exceptions.InvoiceNotFoundException;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceCreateRequest;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceDescriptionResponse;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceResponse;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.dtos.InvoiceUpdateRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InvoiceService {
+
     private final InvoiceRepository repository;
 
-    public InvoiceService(InvoiceRepository repository) {
-        this.repository = repository;
+    public InvoiceService(InvoiceRepository repository) { this.repository = repository; }
+
+    public List<InvoiceResponse> findAll() {
+        List<InvoiceResponse> invoices = new ArrayList<>();
+        try{
+            repository.findAll().forEach(result -> invoices.add(new InvoiceResponse(result)));
+            return invoices;
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado.", ex);
+        }
     }
 
-    public List<Invoice> findAll() {
-        return repository.findAll();
+    public InvoiceDescriptionResponse getDescription(Long id){
+        var invoice = repository.findById(id).orElseThrow(() -> new InvoiceNotFoundException(id));
+        return new InvoiceDescriptionResponse(invoice.getDescription());
     }
 
-    public Optional<String> getDescription(Long id){
-        return repository.findDescriptionById(id);
+    public InvoiceResponse create(InvoiceCreateRequest request) {
+        try{
+            var invoice = new Invoice(
+                    null,
+                    request.description(),
+                    request.issueDate(),
+                    request.subtotalService(),
+                    request.subtotalMileage(),
+                    request.total()
+            );
+            var savedInvoice = repository.save(invoice);
+            return new InvoiceResponse(savedInvoice);
+
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
     }
 
-    public Invoice create(Invoice bankBranch) {
-        return repository.save(bankBranch);
-    }
+    public InvoiceResponse updateTotal(InvoiceUpdateRequest request) {
+        var invoice = repository.findById(request.id()).orElseThrow(() -> new InvoiceNotFoundException(request.id()));
 
-    @Transactional
-    public int updateTotal(Invoice invoice) {
-        return repository.updateTotalService(
-                invoice.getSubtotalService(),
-                invoice.getSubtotalMileage(),
-                invoice.getTotal(),
-                invoice.getId()
-        );
+        try{
+            invoice.setSubtotalService(request.subtotalService());
+            invoice.setSubtotalMileage(request.subtotalMileage());
+            invoice.setTotal(request.total());
+
+            var savedInvoice = repository.save(invoice);
+            return new InvoiceResponse(savedInvoice);
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
     }
 
     public void delete(Long id) {
         var invoice = repository.findById(id).orElseThrow(() -> new InvoiceNotFoundException(id));
-        repository.delete(invoice);
+        try {
+            repository.delete(invoice);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao deletar: pode haver dados relacionados.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao deletar.", ex);
+        }
     }
 
 }

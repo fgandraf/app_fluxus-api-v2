@@ -83,7 +83,7 @@ public class BranchService {
     }
 
     public BranchResponse update(BranchUpdateRequest request){
-        var branch = repository.findById(request.Id()).orElseThrow(() -> new BranchNotFoundException(request.Id()));
+        var branch = repository.findById(request.id()).orElseThrow(() -> new BranchNotFoundException(request.id()));
 
         try{
             branch.setName(request.name());
