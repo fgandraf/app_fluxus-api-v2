@@ -1,10 +1,9 @@
 package com.felipegandra.app_fluxusapiv2.modules.profiles;
 
-import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.ProfileNotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.LogoViewModel;
 import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.ProfileToPrintModel;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,7 +19,7 @@ public class ProfileService {
     }
 
     public Profile findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Profile", id));
+        return repository.findById(id).orElseThrow(() -> new ProfileNotFoundException(id));
     }
 
     public String getLogoBase64() throws IOException {
@@ -36,7 +35,7 @@ public class ProfileService {
     public ProfileToPrintModel findToPrint() {
         List<Object[]> result = repository.findToPrintRaw();
         if (result.isEmpty()) {
-            throw new NotFoundException("Profile", 1L);
+            throw new ProfileNotFoundException(1L);
         }
 
         Object[] row = result.getFirst();
@@ -51,7 +50,7 @@ public class ProfileService {
     }
 
     public String findTradingName() {
-        return repository.findTradingName().orElseThrow(() -> new NotFoundException("Profile", 1L));
+        return repository.findTradingName().orElseThrow(() -> new ProfileNotFoundException(1L));
     }
 
     public Profile create(Profile bankBranch) {
@@ -66,7 +65,7 @@ public class ProfileService {
                     return repository.save(foundProfile);
                 })
                 .orElseThrow(() ->
-                        new NotFoundException("Profile", profile.getId())
+                        new ProfileNotFoundException(profile.getId())
                 );
     }
 

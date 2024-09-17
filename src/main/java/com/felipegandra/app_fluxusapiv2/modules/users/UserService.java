@@ -1,6 +1,7 @@
 package com.felipegandra.app_fluxusapiv2.modules.users;
 
-import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.ProfessionalNotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.UserNotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.users.dtos.UserOutput;
 import com.felipegandra.app_fluxusapiv2.modules.users.enums.UserRole;
 import org.springframework.beans.BeanUtils;
@@ -11,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
             BeanUtils.copyProperties(userDetail, user);
             return user;
         } else {
-            throw new NotFoundException("User", email);
+            throw new UserNotFoundException(email);
         }
     }
 
@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
             BeanUtils.copyProperties(userDetail, user);
             return user;
         } else {
-            throw new NotFoundException("Professional", professionalId);
+            throw new ProfessionalNotFoundException(professionalId);
         }
     }
 
@@ -89,7 +89,7 @@ public class UserService implements UserDetailsService {
             user.get().setActive(true);
             return repository.save(user.get());
         } else {
-            throw new NotFoundException("User", id);
+            throw new UserNotFoundException(id);
         }
     }
 
@@ -99,7 +99,7 @@ public class UserService implements UserDetailsService {
             user.get().setActive(false);
             return repository.save(user.get());
         } else {
-            throw new NotFoundException("User", id);
+            throw new UserNotFoundException(id);
         }
     }
 
@@ -108,7 +108,7 @@ public class UserService implements UserDetailsService {
         if (user.isPresent()) {
             return user.get();
         } else {
-            throw new NotFoundException("User", id);
+            throw new UserNotFoundException(id);
         }
     }
 
@@ -120,7 +120,7 @@ public class UserService implements UserDetailsService {
             user.get().setRole(UserRole.ADMIN);
             return repository.save(user.get());
         } else {
-            throw new NotFoundException("User", id);
+            throw new UserNotFoundException(id);
         }
     }
 
@@ -130,7 +130,7 @@ public class UserService implements UserDetailsService {
             user.get().setRole(UserRole.USER);
             return repository.save(user.get());
         } else {
-            throw new NotFoundException("User", id);
+            throw new UserNotFoundException(id);
         }
     }
 

@@ -1,9 +1,8 @@
 package com.felipegandra.app_fluxusapiv2.modules.branches;
 
-import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.BranchNotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchDetails;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public class BranchService {
     }
 
     public Branch findById(String id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Branch", id));
+        return repository.findById(id).orElseThrow(() -> new BranchNotFoundException(id));
     }
 
     public Optional<BranchDetails> getBranchDetailsById(String branchId) {
@@ -50,12 +49,12 @@ public class BranchService {
                     return repository.save(foundBranch);
                 })
                 .orElseThrow(() ->
-                        new NotFoundException("Branch", branch.getId())
+                        new BranchNotFoundException(branch.getId())
                 );
     }
 
     public void delete(String id) {
-        var branch = repository.findById(id).orElseThrow(() -> new NotFoundException("Branch", id));
+        var branch = repository.findById(id).orElseThrow(() -> new BranchNotFoundException(id));
         repository.delete(branch);
     }
 

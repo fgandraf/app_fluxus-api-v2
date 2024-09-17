@@ -1,6 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.services;
 
-import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.ServiceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public class ServiceService {
     }
 
     public com.felipegandra.app_fluxusapiv2.modules.services.Service findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Service", id));
+        return repository.findById(id).orElseThrow(() -> new ServiceNotFoundException(id));
     }
 
     public List<com.felipegandra.app_fluxusapiv2.modules.services.Service> findAll() {
@@ -34,12 +34,12 @@ public class ServiceService {
                     return repository.save(foundService);
                 })
                 .orElseThrow(() ->
-                        new NotFoundException("Service", service.getId())
+                        new ServiceNotFoundException(service.getId())
                 );
     }
 
     public void delete(Long id) {
-        var service = repository.findById(id).orElseThrow(() -> new NotFoundException("Service", id));
+        var service = repository.findById(id).orElseThrow(() -> new ServiceNotFoundException(id));
         repository.delete(service);
     }
 

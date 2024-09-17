@@ -1,9 +1,8 @@
 package com.felipegandra.app_fluxusapiv2.modules.invoices;
 
-import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.InvoiceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +37,7 @@ public class InvoiceService {
     }
 
     public void delete(Long id) {
-        var invoice = repository.findById(id).orElseThrow(() -> new NotFoundException("Invoice", id));
+        var invoice = repository.findById(id).orElseThrow(() -> new InvoiceNotFoundException(id));
         repository.delete(invoice);
     }
 

@@ -1,6 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals;
 
-import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.ProfessionalNotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalDetails;
 import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalTagNameId;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,7 @@ public class ProfessionalService {
     }
 
     public Professional findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Professional", id));
+        return repository.findById(id).orElseThrow(() -> new ProfessionalNotFoundException(id));
     }
 
     public Professional create(Professional bankBranch) {
@@ -70,12 +70,12 @@ public class ProfessionalService {
                     return repository.save(foundProfessional);
                 })
                 .orElseThrow(() ->
-                        new NotFoundException("Professional", professional.getId())
+                        new ProfessionalNotFoundException(professional.getId())
                 );
     }
 
     public void delete(Long id) {
-        var professional = repository.findById(id).orElseThrow(() -> new NotFoundException("Professional", id));
+        var professional = repository.findById(id).orElseThrow(() -> new ProfessionalNotFoundException(id));
         repository.delete(professional);
     }
 

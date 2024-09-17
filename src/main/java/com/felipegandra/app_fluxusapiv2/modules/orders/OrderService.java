@@ -1,6 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.orders;
 
-import com.felipegandra.app_fluxusapiv2.exceptions.NotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.*;
 import com.felipegandra.app_fluxusapiv2.modules.branches.BranchRepository;
 import com.felipegandra.app_fluxusapiv2.modules.invoices.InvoiceRepository;
 import com.felipegandra.app_fluxusapiv2.modules.orders.dtos.*;
@@ -8,7 +8,6 @@ import com.felipegandra.app_fluxusapiv2.modules.orders.enums.Status;
 import com.felipegandra.app_fluxusapiv2.modules.professionals.ProfessionalRepository;
 import com.felipegandra.app_fluxusapiv2.modules.services.ServiceRepository;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
@@ -209,14 +208,14 @@ public class OrderService {
     }
 
     public Order findById(Long id) {
-        return orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order", id));
+        return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
     }
 
     public Order create(OrderCreateInput model) {
 
-        var branch = branchRepository.findById(model.branchId()).orElseThrow(() -> new NotFoundException("Branch", model.branchId()));
-        var professional = professionalRepository.findById(model.professionalId()).orElseThrow(() -> new NotFoundException("Professional", model.professionalId()));
-        var service = serviceRepository.findById(model.serviceId()).orElseThrow(() -> new NotFoundException("Service", model.professionalId()));
+        var branch = branchRepository.findById(model.branchId()).orElseThrow(() -> new BranchNotFoundException(model.branchId()));
+        var professional = professionalRepository.findById(model.professionalId()).orElseThrow(() -> new ProfessionalNotFoundException(model.professionalId()));
+        var service = serviceRepository.findById(model.serviceId()).orElseThrow(() -> new ServiceNotFoundException(model.professionalId()));
 
         var order = new Order();
         order.setReferenceCode(model.referenceCode());
@@ -246,10 +245,10 @@ public class OrderService {
 
     public Order update(OrderUpdateInput order){
 
-        var branch = branchRepository.findById(order.branchId()).orElseThrow(() -> new NotFoundException("Branch", order.branchId()));
-        var service = serviceRepository.findById(order.serviceId()).orElseThrow(() -> new NotFoundException("Service", order.serviceId()));
-        var professional = professionalRepository.findById(order.professionalId()).orElseThrow(() -> new NotFoundException("Professional", order.professionalId()));
-        var invoice = invoiceRepository.findById(order.invoiceId()).orElseThrow(() -> new NotFoundException("Invoice", order.invoiceId()));
+        var branch = branchRepository.findById(order.branchId()).orElseThrow(() -> new BranchNotFoundException(order.branchId()));
+        var service = serviceRepository.findById(order.serviceId()).orElseThrow(() -> new ServiceNotFoundException(order.professionalId()));
+        var professional = professionalRepository.findById(order.professionalId()).orElseThrow(() -> new ProfessionalNotFoundException(order.professionalId()));
+        var invoice = invoiceRepository.findById(order.invoiceId()).orElseThrow(() -> new InvoiceNotFoundException(order.invoiceId()));
 
         return orderRepository
                 .findById(order.orderId())
@@ -278,16 +277,16 @@ public class OrderService {
                     return orderRepository.save(foundOrder);
                 })
                 .orElseThrow(() ->
-                        new NotFoundException("Order", order.orderId())
+                        new OrderNotFoundException(order.orderId())
                 );
 
     }
 
     public void updateToInvoice(Long invoiceId, List<Long> orders){
-        var invoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new NotFoundException("Invoice", invoiceId));
+        var invoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
 
         for(var item : orders){
-            var order = orderRepository.findById(item).orElseThrow(() -> new NotFoundException("Order", item));
+            var order = orderRepository.findById(item).orElseThrow(() -> new OrderNotFoundException(item));
             order.setInvoice(invoice);
             order.setInvoiced(true);
             orderRepository.save(order);
@@ -295,13 +294,13 @@ public class OrderService {
     }
 
     public void updateStatus(Long orderId, int status){
-        var order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order", orderId));
+        var order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException(orderId));
         order.setStatus(Status.fromInt(status));
         orderRepository.save(order);
     }
 
     public void delete(Long id) {
-        var branch = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order", id));
+        var branch = orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
         orderRepository.delete(branch);
     }
 }
