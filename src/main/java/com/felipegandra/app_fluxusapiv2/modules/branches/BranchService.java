@@ -1,11 +1,15 @@
 package com.felipegandra.app_fluxusapiv2.modules.branches;
 
 import com.felipegandra.app_fluxusapiv2.exceptions.BranchNotFoundException;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchDetails;
+import com.felipegandra.app_fluxusapiv2.exceptions.DatabaseOperationException;
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchCreateRequest;
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchIndexResponse;
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchResponse;
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchUpdateRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BranchService {
@@ -16,59 +20,105 @@ public class BranchService {
         this.repository = repository;
     }
 
-    public List<BranchDetails> getBranchIndex() {
-        return repository.findBranchIndex()
-                .stream()
-                .map(result -> new BranchDetails(
-                        (String) result[0],
-                        (String) result[1],
-                        (String) result[2],
-                        (String) result[3],
-                        (String) result[4]
-                ))
-                .collect(Collectors.toList());
+    public List<BranchIndexResponse> getBranchIndex() {
+        List<BranchIndexResponse> branches = new ArrayList<>();
+
+        try{
+            repository.findBranchIndex()
+                    .forEach(result -> {
+                        var branch = new BranchIndexResponse(
+                                (String) result[0],
+                                (String) result[1],
+                                (String) result[2],
+                                (String) result[3],
+                                (String) result[4]
+                        );
+
+                        branches.add(branch);
+                    });
+
+            return branches;
+
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado.", ex);
+        }
+
     }
 
-    public Branch findById(String id) {
-        return repository.findById(id).orElseThrow(() -> new BranchNotFoundException(id));
+    public BranchResponse findById(String id) {
+        var branch = repository.findById(id).orElseThrow(() -> new BranchNotFoundException(id));
+        return new BranchResponse(branch);
     }
 
-    public Optional<BranchDetails> getBranchDetailsById(String branchId) {
-        return repository.findBranchDetailsById(branchId);
+    public BranchResponse getBranchDetailsById(String branchId) {
+        var branch = repository.findBranchDetailsById(branchId).orElseThrow(() -> new BranchNotFoundException(branchId));
+        return new BranchResponse(branch);
     }
 
-    public Branch create(Branch branch) {
-        return repository.save(branch);
+    public BranchResponse create(BranchCreateRequest request) {
+
+        try{
+            var branch = new Branch(
+                    null,
+                    request.name(),
+                    request.address(),
+                    request.complement(),
+                    request.district(),
+                    request.city(),
+                    request.zip(),
+                    request.state(),
+                    request.contactName(),
+                    request.phone1(),
+                    request.phone2(),
+                    request.email()
+            );
+            var savedBranch = repository.save(branch);
+            return new BranchResponse(savedBranch);
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
+
     }
 
-    public Branch update(Branch branch){
-        return repository
-                .findById(branch.getId())
-                .map(foundBranch -> {
-                    updateEntity(foundBranch, branch);
-                    return repository.save(foundBranch);
-                })
-                .orElseThrow(() ->
-                        new BranchNotFoundException(branch.getId())
-                );
+    public BranchResponse update(BranchUpdateRequest request){
+        var branch = repository.findById(request.Id()).orElseThrow(() -> new BranchNotFoundException(request.Id()));
+
+        try{
+            branch.setName(request.name());
+            branch.setAddress(request.address());
+            branch.setComplement(request.complement());
+            branch.setDistrict(request.district());
+            branch.setCity(request.city());
+            branch.setZip(request.zip());
+            branch.setState(request.state());
+            branch.setContactName(request.contactName());
+            branch.setPhone1(request.phone1());
+            branch.setPhone2(request.phone2());
+            branch.setEmail(request.email());
+
+            var savedBranch = repository.save(branch);
+            return new BranchResponse(savedBranch);
+
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
+
     }
 
     public void delete(String id) {
         var branch = repository.findById(id).orElseThrow(() -> new BranchNotFoundException(id));
-        repository.delete(branch);
-    }
 
-    private void updateEntity(Branch foundBranch, Branch updatedBranch) {
-        foundBranch.setName(updatedBranch.getName());
-        foundBranch.setAddress(updatedBranch.getAddress());
-        foundBranch.setComplement(updatedBranch.getComplement());
-        foundBranch.setDistrict(updatedBranch.getDistrict());
-        foundBranch.setCity(updatedBranch.getCity());
-        foundBranch.setZip(updatedBranch.getZip());
-        foundBranch.setState(updatedBranch.getState());
-        foundBranch.setContactName(updatedBranch.getContactName());
-        foundBranch.setPhone1(updatedBranch.getPhone1());
-        foundBranch.setPhone2(updatedBranch.getPhone2());
-        foundBranch.setEmail(updatedBranch.getEmail());
+        try {
+            repository.delete(branch);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao deletar: pode haver dados relacionados.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao deletar.", ex);
+        }
+
     }
 }

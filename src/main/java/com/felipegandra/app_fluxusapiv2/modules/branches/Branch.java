@@ -46,7 +46,7 @@ public class Branch {
     @OneToMany(mappedBy = "branch")
     private List<Order> orders;
 
-    public Branch(String id, String name, String address, String complement, String district, String city, String zip, String state, String contactName, String phone1, String phone2, String email, List<Order> orders) {
+    public Branch(String id, String name, String address, String complement, String district, String city, String zip, String state, String contactName, String phone1, String phone2, String email) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -59,7 +59,6 @@ public class Branch {
         this.phone1 = phone1;
         this.phone2 = phone2;
         this.email = email;
-        this.orders = orders;
     }
 
 
@@ -76,8 +75,7 @@ public class Branch {
                 branch.getContactName(),
                 branch.getPhone1(),
                 branch.getPhone2(),
-                branch.getEmail(),
-                branch.getOrders()
+                branch.getEmail()
         );
     }
 
