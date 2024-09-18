@@ -11,7 +11,6 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Entity
@@ -112,4 +111,30 @@ public class Order
         return invoice != null ? invoice.getId() : null;
     }
 
+    public Order(Long id, String referenceCode, Branch branch, LocalDate orderDate, LocalDate deadline, Professional professional, Service service, Double serviceAmount, Double mileageAllowance, Boolean siopi, String customerName, String city, String contactName, String contactPhone, String coordinates, Status status, LocalDate pendingDate, LocalDate surveyDate, LocalDate doneDate, String comments, Boolean invoiced, Invoice invoice) {
+        this.id = id;
+        this.referenceCode = referenceCode;
+        this.branch = branch;
+        this.orderDate = orderDate;
+        this.deadline = deadline;
+        this.professional = professional;
+        this.service = service;
+        this.serviceAmount = serviceAmount;
+        this.mileageAllowance = mileageAllowance;
+        this.siopi = siopi;
+        this.customerName = customerName;
+        this.city = city;
+        this.contactName = contactName;
+        this.contactPhone = contactPhone;
+        this.coordinates = coordinates;
+        this.status = status;
+        this.pendingDate = pendingDate;
+        this.surveyDate = surveyDate;
+        this.doneDate = doneDate;
+        this.comments = comments;
+        this.invoiced = invoiced;
+        this.invoice = invoice;
+    }
+
+    public Order() { }
 }

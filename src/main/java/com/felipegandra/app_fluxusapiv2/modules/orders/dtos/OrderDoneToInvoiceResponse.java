@@ -2,7 +2,7 @@ package com.felipegandra.app_fluxusapiv2.modules.orders.dtos;
 
 import java.time.LocalDate;
 
-public record OrderDoneToInvoice(
+public record OrderDoneToInvoiceResponse(
         Long id,
         LocalDate orderDate,
         String referenceCode,
