@@ -1,13 +1,11 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals;
 
-import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalDetails;
-import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalTagNameId;
+import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.*;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -22,36 +20,43 @@ public class ProfessionalController {
 
 
     @GetMapping
-    public ResponseEntity<List<ProfessionalDetails>> getIndex() {
-        return ResponseEntity.ok(service.getProfessionalIndex());
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<ProfessionalIndexResponse>> getIndex() {
+        var response = service.getProfessionalIndex();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("tag-name-id")
-    public ResponseEntity<List<ProfessionalTagNameId>> getTagNameIdIndex() {
-        return ResponseEntity.ok(service.getTagNameId());
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<ProfessionalTagNameIdResponse>> getTagNameIdIndex() {
+        var response = service.getTagNameId();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Professional> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ProfessionalResponse> getById(@PathVariable Long id) {
+        var response = service.findById(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<Professional> create(@Valid @RequestBody Professional professional) {
-        var createdProfessional = service.create(professional);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(createdProfessional.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(createdProfessional);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ProfessionalResponse> create(@Valid @RequestBody ProfessionalCreateRequest request) {
+        var response = service.create(request);
+        var location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping
-    public ResponseEntity<Professional> update(@RequestBody Professional professional) {
-        return ResponseEntity.ok(service.update(professional));
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ProfessionalResponse> update(@Valid @RequestBody ProfessionalUpdateRequest request) {
+        var response = service.update(request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

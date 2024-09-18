@@ -1,12 +1,12 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals;
 
+import com.felipegandra.app_fluxusapiv2.exceptions.DatabaseOperationException;
 import com.felipegandra.app_fluxusapiv2.exceptions.ProfessionalNotFoundException;
-import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalDetails;
-import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.ProfessionalTagNameId;
+import com.felipegandra.app_fluxusapiv2.modules.professionals.dtos.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProfessionalService {
@@ -17,79 +17,124 @@ public class ProfessionalService {
         this.repository = professionalRepository;
     }
 
-    public List<ProfessionalDetails> getProfessionalIndex() {
-        return repository.findProfessionalIndex()
-                .stream()
-                .map(result -> new ProfessionalDetails(
-                        (Long) result[0],
-                        (String) result[1],
-                        (String) result[2],
-                        (String) result[3],
-                        (String) result[4]
-                ))
-                .collect(Collectors.toList());
+    public List<ProfessionalIndexResponse> getProfessionalIndex() {
+        List<ProfessionalIndexResponse> professionals = new ArrayList<>();
+
+        try{
+            repository.findProfessionalIndex().forEach(x -> professionals.add(objetoToIndexResponse(x)));
+            return professionals;
+
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado.", ex);
+        }
+
     }
 
-    public List<ProfessionalTagNameId> getTagNameId() {
+    public List<ProfessionalTagNameIdResponse> getTagNameId() {
 
-        return repository.findProfessionalTagNameId()
-                .stream()
-                .map(result -> {
-                    Long id = (Long) result[0];
-                    String tag = (String) result[1];
-                    String profession = (String) result[2];
-                    String name = (String) result[3];
+        List<ProfessionalTagNameIdResponse> professionals = new ArrayList<>();
 
-                    String nameId = profession != null ? profession.substring(0, 3) + ". " : "";
-                    String[] nameParts = name.split(" ");
-                    if (nameParts.length > 1) {
-                        nameId += nameParts[0] + " " + nameParts[nameParts.length - 1];
-                    } else {
-                        nameId += name;
-                    }
+        try{
+            repository.findProfessionalIndex()
+                    .forEach(x -> {
+                        var result = objetoToIndexResponse(x);
 
-                    return new ProfessionalTagNameId(id, tag, nameId);
-                    })
-                .collect(Collectors.toList()
-                );
+                        var nameSplited = result.name().split(" ");
+                        var firstName = nameSplited[0];
+                        var lastName = nameSplited.length > 1 ? " " + nameSplited[nameSplited.length - 1] : "";
+                        var profesionAbbreviation = result.profession() != null ? result.profession().substring(0, 3) + ". " : "";
+                        var nameId = profesionAbbreviation + firstName + lastName;
+
+                        var professional = new ProfessionalTagNameIdResponse(result.id(), result.tag(), nameId);
+
+                        professionals.add(professional);
+                    });
+
+            return professionals;
+
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado.", ex);
+        }
+
     }
 
-    public Professional findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new ProfessionalNotFoundException(id));
+    public ProfessionalResponse findById(Long id) {
+        var professional = repository.findById(id).orElseThrow(() -> new ProfessionalNotFoundException(id));
+        return new ProfessionalResponse(professional);
     }
 
-    public Professional create(Professional bankBranch) {
-        return repository.save(bankBranch);
+    public ProfessionalResponse create(ProfessionalCreateRequest request) {
+
+        try{
+            var profesional = new Professional(
+                    null,
+                    request.tag(),
+                    request.name(),
+                    request.cpf(),
+                    request.birthday(),
+                    request.profession(),
+                    request.permitNumber(),
+                    request.association(),
+                    request.phone1(),
+                    request.phone2(),
+                    request.email()
+            );
+
+            var savedProfessional = repository.save(profesional);
+            return new ProfessionalResponse(savedProfessional);
+
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
     }
 
-    public Professional update(Professional professional) {
-        return repository
-                .findById(professional.getId())
-                .map(foundProfessional -> {
-                    updateEntity(foundProfessional, professional);
-                    return repository.save(foundProfessional);
-                })
-                .orElseThrow(() ->
-                        new ProfessionalNotFoundException(professional.getId())
-                );
+    public ProfessionalResponse update(ProfessionalUpdateRequest request) {
+        var professional = repository.findById(request.id()).orElseThrow(() -> new ProfessionalNotFoundException(request.id()));
+
+        try{
+            professional.setTag(request.tag());
+            professional.setName(request.name());
+            professional.setCpf(request.cpf());
+            professional.setBirthday(request.birthday());
+            professional.setProfession(request.profession());
+            professional.setPermitNumber(request.permitNumber());
+            professional.setAssociation(request.association());
+            professional.setPhone1(request.phone1());
+            professional.setPhone2(request.phone2());
+            professional.setEmail(request.email());
+
+            var savedProfessional = repository.save(professional);
+            return new ProfessionalResponse(savedProfessional);
+
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
     }
 
     public void delete(Long id) {
         var professional = repository.findById(id).orElseThrow(() -> new ProfessionalNotFoundException(id));
-        repository.delete(professional);
+
+        try {
+            repository.delete(professional);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao deletar: pode haver dados relacionados.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao deletar.", ex);
+        }
     }
 
-    private void updateEntity(Professional foundProfessional, Professional updatedProfessional) {
-        foundProfessional.setTag(updatedProfessional.getTag());
-        foundProfessional.setName(updatedProfessional.getName());
-        foundProfessional.setCpf(updatedProfessional.getCpf());
-        foundProfessional.setBirthday(updatedProfessional.getBirthday());
-        foundProfessional.setProfession(updatedProfessional.getProfession());
-        foundProfessional.setPermitNumber(updatedProfessional.getPermitNumber());
-        foundProfessional.setAssociation(updatedProfessional.getAssociation());
-        foundProfessional.setPhone1(updatedProfessional.getPhone1());
-        foundProfessional.setPhone2(updatedProfessional.getPhone2());
-        foundProfessional.setEmail(updatedProfessional.getEmail());
+    private ProfessionalIndexResponse objetoToIndexResponse(Object[] result){
+        var id = (Long) result[0];
+        var tag = (String) result[1];
+        var name = (String) result[2];
+        var profession = (String) result[3];
+        var phone1 = (String) result[4];
+
+        return new ProfessionalIndexResponse(id, tag, name, profession, phone1);
     }
 
 }

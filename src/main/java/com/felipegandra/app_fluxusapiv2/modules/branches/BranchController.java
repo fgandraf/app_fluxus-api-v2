@@ -24,7 +24,8 @@ public class BranchController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BranchIndexResponse>> getIndex() {
-        return ResponseEntity.ok(service.getBranchIndex());
+        var response = service.getBranchIndex();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

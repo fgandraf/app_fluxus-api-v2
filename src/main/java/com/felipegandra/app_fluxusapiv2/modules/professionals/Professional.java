@@ -38,4 +38,20 @@ public class Professional
 
     @OneToMany(mappedBy = "professional")
     private List<Order> orders;
+
+    public Professional(Long id, String tag, String name, String cpf, LocalDate birthday, String profession, String permitNumber, String association, String phone1, String phone2, String email) {
+        this.id = id;
+        this.tag = tag;
+        this.name = name;
+        this.cpf = cpf;
+        this.birthday = birthday;
+        this.profession = profession;
+        this.permitNumber = permitNumber;
+        this.association = association;
+        this.phone1 = phone1;
+        this.phone2 = phone2;
+        this.email = email;
+    }
+
+    public Professional() {}
 }

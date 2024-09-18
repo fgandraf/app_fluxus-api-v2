@@ -1,8 +1,10 @@
 package com.felipegandra.app_fluxusapiv2.modules.professionals.dtos;
 
-public record ProfessionalTagNameId(
+public record ProfessionalIndexResponse(
         Long id,
         String tag,
-        String nameid
+        String name,
+        String profession,
+        String phone1
 ) {
 }
