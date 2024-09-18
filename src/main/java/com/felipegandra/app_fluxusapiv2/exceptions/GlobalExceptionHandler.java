@@ -33,6 +33,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ProfileLogoNotFoundException.class)
+    public ResponseEntity<String> handleProfileLogoNotFoundException(ProfileLogoNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProfileLogoNotWrittenException.class)
+    public ResponseEntity<String> handleProfileLogoNotWrittenException(ProfileLogoNotWrittenException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(ProfileNotFoundException.class)
     public ResponseEntity<String> handleProfileNotFoundException(ProfileNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);

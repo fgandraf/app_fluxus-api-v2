@@ -1,15 +1,11 @@
 package com.felipegandra.app_fluxusapiv2.modules.profiles;
 
-import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.LogoViewModel;
-import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.ProfileToPrintModel;
+import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.io.IOException;
-import java.net.URI;
 
 @RestController
 @RequestMapping("v2/profiles")
@@ -21,64 +17,53 @@ public class ProfileController {
     }
 
     @GetMapping
-    public ResponseEntity<Profile> getById() {
-        return ResponseEntity.ok(service.findById(1L));
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ProfileResponse> getById() {
+        var response = service.findById(1L);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/logo")
-    public ResponseEntity<String> getLogo() {
-        try {
-            var logo = service.getLogoBase64();
-            return ResponseEntity.ok(logo);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ProfileLogoResponse> getLogo() {
+        var response = service.getLogoBase64();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/to-print")
-    public ResponseEntity<ProfileToPrintModel> getToPrint() {
-        ProfileToPrintModel profile = service.findToPrint();
-
-        try {
-            var logo = service.getLogoBase64();
-            profile.setLogo(logo);
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar o logo: " + e.getMessage());
-        }
-
-        return ResponseEntity.ok(profile);
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ProfileToPrintResponse> getToPrint() {
+        var response = service.getToPrint();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("trading-name")
-    public ResponseEntity<String> getTradingName() {
-        return ResponseEntity.ok(service.findTradingName());
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ProfileTradingNameResponse> getTradingName() {
+        var response = service.findTradingName();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<Profile> create(@Valid @RequestBody Profile profile) {
-        profile.setId(1L);
-        service.create(profile);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("")
-                .buildAndExpand(1L)
-                .toUri();
-        return ResponseEntity.created(location).body(profile);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ProfileResponse> create(@Valid @RequestBody ProfileCreateRequest request) {
+        var response = service.create(request);
+        var location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("/logo")
-    public ResponseEntity<Void> putLogo(@RequestBody LogoViewModel model) {
-        try {
-            service.setLogoBase64(model);
-            return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> putLogo(@RequestBody ProfileUpdateLogoRequest request) {
+        service.updateProfileLogo(request);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping
-    public ResponseEntity<Profile> update(@RequestBody Profile profile) {
-        profile.setId(1L);
-        return ResponseEntity.ok(service.update(profile));
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ProfileResponse> update(@Valid @RequestBody ProfileUpdateRequest request) {
+        var response = service.update(request);
+        return ResponseEntity.ok(response);
     }
 
 }

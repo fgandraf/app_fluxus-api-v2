@@ -1,14 +1,16 @@
 package com.felipegandra.app_fluxusapiv2.modules.profiles;
 
+import com.felipegandra.app_fluxusapiv2.exceptions.DatabaseOperationException;
+import com.felipegandra.app_fluxusapiv2.exceptions.ProfileLogoNotFoundException;
+import com.felipegandra.app_fluxusapiv2.exceptions.ProfileLogoNotWrittenException;
 import com.felipegandra.app_fluxusapiv2.exceptions.ProfileNotFoundException;
-import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.LogoViewModel;
-import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.ProfileToPrintModel;
+import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.List;
 
 @Service
 public class ProfileService {
@@ -18,83 +20,139 @@ public class ProfileService {
         this.repository = repository;
     }
 
-    public Profile findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new ProfileNotFoundException(id));
+    public ProfileResponse findById(Long id) {
+        var profile = repository.findById(id).orElseThrow(() -> new ProfileNotFoundException(id));
+        return new ProfileResponse(profile);
     }
 
-    public String getLogoBase64() throws IOException {
-        byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/static/logo.png"));
-        return Base64.getEncoder().encodeToString(fileContent);
-    }
-
-    public void setLogoBase64(LogoViewModel model) throws IOException {
-        byte[] bytes = Base64.getDecoder().decode(model.base64Image());
-        Files.write(Paths.get("src/main/resources/static/logo.png"), bytes);
-    }
-
-    public ProfileToPrintModel findToPrint() {
-        List<Object[]> result = repository.findToPrintRaw();
-        if (result.isEmpty()) {
-            throw new ProfileNotFoundException(1L);
+    public ProfileLogoResponse getLogoBase64() {
+        try{
+            var fileContent = Files.readAllBytes(Paths.get("src/main/resources/static/logo.png"));
+            var encoded = Base64.getEncoder().encodeToString(fileContent);
+            return new ProfileLogoResponse(encoded);
+        }catch (IOException e){
+            throw new ProfileLogoNotFoundException();
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado.", ex);
         }
-
-        Object[] row = result.getFirst();
-
-        var profileToPrint = new ProfileToPrintModel();
-        profileToPrint.setCnpj((String) row[0]);
-        profileToPrint.setCompanyName((String) row[1]);
-        profileToPrint.setContractNotice((String) row[2]);
-        profileToPrint.setContractNumber((String) row[3]);
-
-        return profileToPrint;
     }
 
-    public String findTradingName() {
-        return repository.findTradingName().orElseThrow(() -> new ProfileNotFoundException(1L));
+    public void updateProfileLogo(ProfileUpdateLogoRequest request) {
+        try{
+            var fileContent = Base64.getDecoder().decode(request.base64Image());
+            Files.write(Paths.get("src/main/resources/static/logo.png"), fileContent);
+        }catch (IOException e){
+            throw new ProfileLogoNotWrittenException();
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado.", ex);
+        }
     }
 
-    public Profile create(Profile bankBranch) {
-        return repository.save(bankBranch);
+    public ProfileToPrintResponse getToPrint() {
+        try{
+            var result = repository.findToPrint();
+            if (result.isEmpty()) {
+                throw new ProfileNotFoundException(1L);
+            }
+
+            return new ProfileToPrintResponse(
+                    (String) result.getFirst()[0],
+                    (String) result.getFirst()[1],
+                    (String) result.getFirst()[2],
+                    (String) result.getFirst()[3],
+                    (String) result.getFirst()[4]
+            );
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado.", ex);
+        }
     }
 
-    public Profile update(Profile profile){
-        return repository
-                .findById(profile.getId())
-                .map(foundProfile -> {
-                    updateEntity(foundProfile, profile);
-                    return repository.save(foundProfile);
-                })
-                .orElseThrow(() ->
-                        new ProfileNotFoundException(profile.getId())
-                );
+    public ProfileTradingNameResponse findTradingName() {
+        var tradingName = repository.findTradingName().orElseThrow(() -> new ProfileNotFoundException(1L));
+        return new ProfileTradingNameResponse(tradingName);
     }
 
-    private void updateEntity(Profile foundProfile, Profile updatedProfile) {
-        foundProfile.setCnpj(updatedProfile.getCnpj());
-        foundProfile.setTradingName(updatedProfile.getTradingName());
-        foundProfile.setCompanyName(updatedProfile.getCompanyName());
-        foundProfile.setStateId(updatedProfile.getStateId());
-        foundProfile.setCityId(updatedProfile.getCityId());
-        foundProfile.setAddress(updatedProfile.getAddress());
-        foundProfile.setComplement(updatedProfile.getComplement());
-        foundProfile.setDistrict(updatedProfile.getDistrict());
-        foundProfile.setCity(updatedProfile.getCity());
-        foundProfile.setZip(updatedProfile.getZip());
-        foundProfile.setState(updatedProfile.getState());
-        foundProfile.setEstablishmentDate(updatedProfile.getEstablishmentDate());
-        foundProfile.setPhone1(updatedProfile.getPhone1());
-        foundProfile.setPhone2(updatedProfile.getPhone2());
-        foundProfile.setEmail(updatedProfile.getEmail());
-        foundProfile.setBankAccountName(updatedProfile.getBankAccountName());
-        foundProfile.setBankAccountType(updatedProfile.getBankAccountType());
-        foundProfile.setBankAccountBranch(updatedProfile.getBankAccountBranch());
-        foundProfile.setBankAccountDigit(updatedProfile.getBankAccountDigit());
-        foundProfile.setBankAccountNumber(updatedProfile.getBankAccountNumber());
-        foundProfile.setContractorName(updatedProfile.getContractorName());
-        foundProfile.setContractNotice(updatedProfile.getContractNotice());
-        foundProfile.setContractNumber(updatedProfile.getContractNumber());
-        foundProfile.setContractEstablished(updatedProfile.getContractEstablished());
-        foundProfile.setContractStart(updatedProfile.getContractStart());
-        foundProfile.setContractEnd(updatedProfile.getContractEnd());
+    public ProfileResponse create(ProfileCreateRequest request) {
+
+        try{
+            var profile = new Profile(
+                    1L,
+                    request.cnpj(),
+                    request.tradingName(),
+                    request.companyName(),
+                    request.stateId(),
+                    request.cityId(),
+                    request.address(),
+                    request.complement(),
+                    request.district(),
+                    request.city(),
+                    request.zip(),
+                    request.state(),
+                    request.establishmentDate(),
+                    request.phone1(),
+                    request.phone2(),
+                    request.email(),
+                    request.bankAccountName(),
+                    request.bankAccountType(),
+                    request.bankAccountBranch(),
+                    request.bankAccountDigit(),
+                    request.bankAccountNumber(),
+                    request.contractorName(),
+                    request.contractNotice(),
+                    request.contractNumber(),
+                    request.contractEstablished(),
+                    request.contractStart(),
+                    request.contractEnd()
+            );
+
+            var savedProfile = repository.save(profile);
+            return new ProfileResponse(savedProfile);
+
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
+    }
+
+    public ProfileResponse update(ProfileUpdateRequest request){
+        var profile = repository.findById(request.id()).orElseThrow(() -> new ProfileNotFoundException(request.id()));
+
+        try{
+                profile.setCnpj(request.cnpj());
+                profile.setTradingName(request.tradingName());
+                profile.setCompanyName(request.companyName());
+                profile.setStateId(request.stateId());
+                profile.setCityId(request.cityId());
+                profile.setAddress(request.address());
+                profile.setComplement(request.complement());
+                profile.setDistrict(request.district());
+                profile.setCity(request.city());
+                profile.setZip(request.zip());
+                profile.setState(request.state());
+                profile.setEstablishmentDate(request.establishmentDate());
+                profile.setPhone1(request.phone1());
+                profile.setPhone2(request.phone2());
+                profile.setEmail(request.email());
+                profile.setBankAccountName(request.bankAccountName());
+                profile.setBankAccountType(request.bankAccountType());
+                profile.setBankAccountBranch(request.bankAccountBranch());
+                profile.setBankAccountDigit(request.bankAccountDigit());
+                profile.setBankAccountNumber(request.bankAccountNumber());
+                profile.setContractorName(request.contractorName());
+                profile.setContractNotice(request.contractNotice());
+                profile.setContractNumber(request.contractNumber());
+                profile.setContractEstablished(request.contractEstablished());
+                profile.setContractStart(request.contractStart());
+                profile.setContractEnd(request.contractEnd());
+
+                var savedProfile = repository.save(profile);
+                return new ProfileResponse(savedProfile);
+
+        }catch (DataIntegrityViolationException ex) {
+            throw new DatabaseOperationException("Erro ao salvar: dados inválidos ou em conflito.", ex);
+        } catch (Exception ex) {
+            throw new DatabaseOperationException("Erro inesperado ao salvar.", ex);
+        }
     }
 }

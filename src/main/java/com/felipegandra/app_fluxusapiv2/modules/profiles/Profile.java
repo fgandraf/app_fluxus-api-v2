@@ -86,4 +86,37 @@ public class Profile
 
     @Column(name = "contract_end")
     public LocalDate contractEnd;
+
+
+    public Profile(Long id, String cnpj, String tradingName, String companyName, String stateId, String cityId, String address, String complement, String district, String city, String zip, String state, LocalDate establishmentDate, String phone1, String phone2, String email, String bankAccountName, String bankAccountType, String bankAccountBranch, String bankAccountDigit, String bankAccountNumber, String contractorName, String contractNotice, String contractNumber, LocalDate contractEstablished, LocalDate contractStart, LocalDate contractEnd) {
+        this.id = id;
+        this.cnpj = cnpj;
+        this.tradingName = tradingName;
+        this.companyName = companyName;
+        this.stateId = stateId;
+        this.cityId = cityId;
+        this.address = address;
+        this.complement = complement;
+        this.district = district;
+        this.city = city;
+        this.zip = zip;
+        this.state = state;
+        this.establishmentDate = establishmentDate;
+        this.phone1 = phone1;
+        this.phone2 = phone2;
+        this.email = email;
+        this.bankAccountName = bankAccountName;
+        this.bankAccountType = bankAccountType;
+        this.bankAccountBranch = bankAccountBranch;
+        this.bankAccountDigit = bankAccountDigit;
+        this.bankAccountNumber = bankAccountNumber;
+        this.contractorName = contractorName;
+        this.contractNotice = contractNotice;
+        this.contractNumber = contractNumber;
+        this.contractEstablished = contractEstablished;
+        this.contractStart = contractStart;
+        this.contractEnd = contractEnd;
+    }
+
+    public Profile(){}
 }
