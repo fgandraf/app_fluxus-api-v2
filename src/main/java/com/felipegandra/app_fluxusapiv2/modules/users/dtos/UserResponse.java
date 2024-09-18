@@ -3,7 +3,7 @@ package com.felipegandra.app_fluxusapiv2.modules.users.dtos;
 import com.felipegandra.app_fluxusapiv2.modules.users.User;
 import com.felipegandra.app_fluxusapiv2.modules.users.enums.UserRole;
 
-public record UserOutput(
+public record UserResponse(
         Long id,
         String email,
         Long professionalId,
@@ -12,7 +12,7 @@ public record UserOutput(
         Boolean technicianResponsible,
         UserRole role
 ){
-    public UserOutput(User user) {
+    public UserResponse(User user) {
         this(
                 user.getId(),
                 user.getEmail(),

@@ -4,16 +4,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UserInfoUpdateInput(
-
-        Long id,
+public record UserCreateRequest(
 
         @NotBlank(message = "Email is required!")
         @Email(message = "Invalid email address!")
+        @Size(min = 1, max = 255, message = "Email address must be between 1 and 255 characters.")
         String email,
 
         @NotBlank(message = "Password is required!")
-        @Size(min = 6, max = 20, message = "Password must be between 6 -20  characters")
-        String userPassword
+        @Size(min = 4, max = 20, message = "Password must be between 4 -20  characters")
+        String password
 ) {
 }

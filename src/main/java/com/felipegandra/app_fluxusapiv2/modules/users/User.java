@@ -68,4 +68,22 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() { return active; }
+
+    public User(Long id, Long professionalId, Boolean technicianResponsible, Boolean legalResponsible, Boolean active, String email, String password, UserRole role) {
+        this.id = id;
+        this.professionalId = professionalId;
+        this.technicianResponsible = technicianResponsible;
+        this.legalResponsible = legalResponsible;
+        this.active = active;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public User() {}
 }
