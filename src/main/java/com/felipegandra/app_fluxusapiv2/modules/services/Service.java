@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 
 @Entity
@@ -32,4 +31,14 @@ public class Service
 
     @OneToMany(mappedBy = "service")
     private List<Order> orders;
+
+    public Service(Long id, String tag, String description, Double serviceAmount, Double mileageAllowance) {
+        this.id = id;
+        this.tag = tag;
+        this.description = description;
+        this.serviceAmount = serviceAmount;
+        this.mileageAllowance = mileageAllowance;
+    }
+
+    public Service(){}
 }
