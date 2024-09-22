@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,29 +24,29 @@ public class InvoiceController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<InvoiceResponse>> getAll() {
-        var response = service.findAll();
+        List<InvoiceResponse> response = service.findAll();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/description/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InvoiceDescriptionResponse> getDescription(@PathVariable Long id) {
-         var response = service.getDescription(id);
+         InvoiceDescriptionResponse response = service.getDescription(id);
          return ResponseEntity.ok(response);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<InvoiceResponse> create(@Valid @RequestBody InvoiceCreateRequest request) {
-        var response = service.create(request);
-        var location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
+        InvoiceResponse response = service.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("totals")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<InvoiceResponse> putTotals(@Valid @RequestBody InvoiceUpdateRequest request) {
-        var response = service.updateTotal(request);
+        InvoiceResponse response = service.updateTotal(request);
         return ResponseEntity.ok(response);
     }
 

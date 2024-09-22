@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,29 +24,29 @@ public class ServiceController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<ServiceResponse>> getAll() {
-        var response = serviceService.findAll();
+        List<ServiceResponse> response = serviceService.findAll();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ServiceResponse> getById(@PathVariable Long id) {
-        var response = serviceService.findById(id);
+        ServiceResponse response = serviceService.findById(id);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ServiceResponse> create(@Valid @RequestBody ServiceCreateRequest request) {
-        var response = serviceService.create(request);
-        var location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
+        ServiceResponse response = serviceService.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ServiceResponse> update(@Valid @RequestBody ServiceUpdateRequest request) {
-        var response = serviceService.update(request);
+        ServiceResponse response = serviceService.update(request);
         return ResponseEntity.ok(response);
     }
 

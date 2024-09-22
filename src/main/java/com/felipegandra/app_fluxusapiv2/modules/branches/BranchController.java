@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,36 +25,36 @@ public class BranchController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BranchIndexResponse>> getIndex() {
-        var response = service.getBranchIndex();
+        List<BranchIndexResponse> response = service.getBranchIndex();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<BranchResponse> getById(@PathVariable String id) {
-        var response = service.findById(id);
+        BranchResponse response = service.findById(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("contacts/{branchId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<BranchResponse> getDetailsById(@PathVariable String branchId) {
-        var response =  service.getBranchDetailsById(branchId);
+        BranchResponse response =  service.getBranchDetailsById(branchId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<BranchResponse> create(@Valid @RequestBody BranchCreateRequest request) {
-        var response = service.create(request);
-        var location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
+        BranchResponse response = service.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<BranchResponse> update(@Valid @RequestBody BranchUpdateRequest request) {
-        var response = service.update(request);
+        BranchResponse response = service.update(request);
         return ResponseEntity.ok(response);
     }
 
