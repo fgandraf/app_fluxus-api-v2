@@ -1,6 +1,8 @@
 package com.felipegandra.app_fluxusapiv2.modules.profiles;
 
 import com.felipegandra.app_fluxusapiv2.modules.profiles.dtos.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("v2/profiles")
+@Tag(name = "Profile Controller", description = "Controladora responsável por gerenciar o perfil da empresa")
 public class ProfileController {
     private final ProfileService service;
 
@@ -18,6 +21,7 @@ public class ProfileController {
     }
 
     @GetMapping
+    @Operation(summary = "Obter perfil", description = "Retorna os dados do perfil.")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ProfileResponse> getById() {
         ProfileResponse response = service.findById(1L);
@@ -25,6 +29,7 @@ public class ProfileController {
     }
 
     @GetMapping("/logo")
+    @Operation(summary = "Obter logotipo", description = "Retorna o logotipo do perfil.")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ProfileLogoResponse> getLogo() {
         ProfileLogoResponse response = service.getLogoBase64();
@@ -32,6 +37,7 @@ public class ProfileController {
     }
 
     @GetMapping("/to-print")
+    @Operation(summary = "Obter dados para impressão do perfil", description = "Retorna os dados para impressão do perfil.")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ProfileToPrintResponse> getToPrint() {
         ProfileToPrintResponse response = service.getToPrint();
@@ -39,6 +45,7 @@ public class ProfileController {
     }
 
     @GetMapping("trading-name")
+    @Operation(summary = "Obter o nome da fantasia", description = "Retorna o nome fantasia do perfil.")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ProfileTradingNameResponse> getTradingName() {
         ProfileTradingNameResponse response = service.findTradingName();
@@ -46,6 +53,7 @@ public class ProfileController {
     }
 
     @PostMapping
+    @Operation(summary = "Criar um novo perfil", description = "Insere um novo perfil na base de dados.")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ProfileResponse> create(@Valid @RequestBody ProfileCreateRequest request) {
         ProfileResponse response = service.create(request);
@@ -54,6 +62,7 @@ public class ProfileController {
     }
 
     @PutMapping("/logo")
+    @Operation(summary = "Atualiza o logotipo", description = "Atualiza o logotipo do perfil existente.")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> putLogo(@RequestBody ProfileUpdateLogoRequest request) {
         service.updateProfileLogo(request);
@@ -61,6 +70,7 @@ public class ProfileController {
     }
 
     @PutMapping
+    @Operation(summary = "Atualiza o perfil", description = "Atualiza as informações do perfil existente.")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ProfileResponse> update(@Valid @RequestBody ProfileUpdateRequest request) {
         ProfileResponse response = service.update(request);

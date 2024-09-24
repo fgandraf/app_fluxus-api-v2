@@ -6,6 +6,7 @@ import com.felipegandra.app_fluxusapiv2.exceptions.NoRecordsFoundException;
 import com.felipegandra.app_fluxusapiv2.exceptions.UserNotFoundException;
 import com.felipegandra.app_fluxusapiv2.modules.users.dtos.*;
 import com.felipegandra.app_fluxusapiv2.modules.users.enums.UserRole;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +25,7 @@ public class UserService implements UserDetailsService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
 
-    public UserService(UserRepository repository, AuthenticationManager authenticationManager, TokenService tokenService) {
+    public UserService(UserRepository repository, @Lazy AuthenticationManager authenticationManager, TokenService tokenService) {
         this.repository = repository;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
