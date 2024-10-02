@@ -16,8 +16,7 @@ public class Service
 {
     @Id
     @Column(name = "service_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_SERVICE")
-    @SequenceGenerator(name = "SEQ_SERVICE", sequenceName = "SEQ_SERVICE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     public String tag;

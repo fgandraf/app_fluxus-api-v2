@@ -18,8 +18,7 @@ public class Invoice
 {
     @Id
     @Column(name = "invoice_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_INVOICE")
-    @SequenceGenerator(name = "SEQ_INVOICE", sequenceName = "SEQ_INVOICE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     public String description;

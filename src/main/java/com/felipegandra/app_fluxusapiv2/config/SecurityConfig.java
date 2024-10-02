@@ -30,9 +30,11 @@
                             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .authorizeHttpRequests(authorize -> authorize
 
+                            // HEALTH CHECK
+                            .requestMatchers(HttpMethod.GET, "/v2").anonymous()
+
                             // SWAGGER DOCUMENTATION
                             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-
 
                             // BRANCH
                             .requestMatchers(HttpMethod.GET, "/v2/branches").hasAnyRole("ADMIN", "USER")

@@ -22,8 +22,7 @@ public class Order
 {
     @Id
     @Column(name = "order_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_ORDER")
-    @SequenceGenerator(name = "SEQ_ORDER", sequenceName = "SEQ_ORDER", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @Column(name = "reference_code")

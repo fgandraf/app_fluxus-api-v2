@@ -18,8 +18,7 @@ public class Professional
 {
     @Id
     @Column(name = "professional_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_PROFESSIONAL")
-    @SequenceGenerator(name = "SEQ_PROFESSIONAL", sequenceName = "SEQ_PROFESSIONAL", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     public String tag;
