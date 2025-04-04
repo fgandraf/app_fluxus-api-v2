@@ -10,10 +10,10 @@ import java.util.Optional;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
-    @Query(value = "SELECT DESCRIPTION FROM TBL_INVOICE WHERE INVOICE_ID = :invoiceId", nativeQuery = true)
+    @Query(value = "SELECT DESCRIPTION FROM tbl_invoice WHERE INVOICE_ID = :invoiceId", nativeQuery = true)
     Optional<String> findDescriptionById(Long invoiceId);
 
     @Modifying
-    @Query(value = "UPDATE TBL_INVOICE SET SUBTOTAL_SERVICE = :subtotalService, SUBTOTAL_MILEAGE = :subtotalMileage, TOTAL = :total WHERE INVOICE_ID = :invoiceId", nativeQuery = true)
+    @Query(value = "UPDATE tbl_invoice SET SUBTOTAL_SERVICE = :subtotalService, SUBTOTAL_MILEAGE = :subtotalMileage, TOTAL = :total WHERE INVOICE_ID = :invoiceId", nativeQuery = true)
     int updateTotalService(Double subtotalService, Double subtotalMileage, Double total, Long invoiceId);
 }

@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface ProfessionalRepository extends JpaRepository<Professional, Long> {
 
-    @Query(value = "SELECT PROFESSIONAL_ID, TAG, NAME, PROFESSION, PHONE1 FROM TBL_PROFESSIONAL ORDER BY TAG", nativeQuery = true)
+    @Query(value = "SELECT PROFESSIONAL_ID, TAG, NAME, PROFESSION, PHONE1 FROM tbl_professional ORDER BY TAG", nativeQuery = true)
     List<Object[]> findProfessionalIndex();
 
 }
