@@ -55,12 +55,14 @@ public class ProfileService {
                 throw new ProfileNotFoundException(1L);
             }
 
+            var logo = getLogoBase64();
+
             return new ProfileToPrintResponse(
                     (String) result.getFirst()[0],
                     (String) result.getFirst()[1],
                     (String) result.getFirst()[2],
                     (String) result.getFirst()[3],
-                    (String) result.getFirst()[4]
+                    logo.base64Image()
             );
         } catch (Exception ex) {
             throw new DatabaseOperationException("Erro inesperado.", ex);

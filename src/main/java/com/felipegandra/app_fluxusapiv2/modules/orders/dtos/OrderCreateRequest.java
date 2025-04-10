@@ -22,11 +22,9 @@ public record OrderCreateRequest(
         LocalDate deadline,
 
         @NotNull(message = "Professional Id is required.")
-        @Size(min = 4, max = 4, message = "Profesional Id must be 4 characters long")
         Long professionalId,
 
         @NotNull(message = "Service Id is required.")
-        @Size(min = 4, max = 4, message = "Service id must be 4 characters long")
         Long serviceId,
 
         @NotNull(message = "Service Amount is required.")

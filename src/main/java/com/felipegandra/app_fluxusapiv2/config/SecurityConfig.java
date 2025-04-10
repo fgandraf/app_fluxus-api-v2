@@ -42,26 +42,27 @@
                             .requestMatchers(HttpMethod.GET, "/v2/branches/contacts/{branchId}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/v2/branches").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/v2/branches").hasRole("ADMIN")
-                            .requestMatchers(HttpMethod.DELETE, "/v2/branches").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/v2/branches/{id}").hasRole("ADMIN")
 
                             // INVOICES
                             .requestMatchers(HttpMethod.GET, "/v2/invoices").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/v2/invoices/description/{id}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/v2/invoices").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/v2/invoices/totals").hasRole("ADMIN")
-                            .requestMatchers(HttpMethod.DELETE, "/v2/invoices").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/v2/invoices/{id}").hasRole("ADMIN")
 
                             // ORDER
                             .requestMatchers(HttpMethod.GET, "/v2/orders/flow").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/v2/orders/cities").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/v2/orders/done-to-invoice").hasAnyRole("ADMIN", "USER")
-                            .requestMatchers(HttpMethod.GET, "/v2/orders/filtered/{filter}").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.GET, "/v2/orders/filtered").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/v2/orders/invoiced/{invoiceId}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/v2/orders/professionals/{invoiceId}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/v2/orders/{id}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/v2/orders").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.PUT, "/v2/orders/update-status/{orderId},{status}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.PUT, "/v2/orders").hasAnyRole("ADMIN", "USER")
-                            .requestMatchers(HttpMethod.DELETE, "/v2/orders").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.DELETE, "/v2/orders/{id}").hasAnyRole("ADMIN", "USER")
 
                             // PROFESSIONALS
                             .requestMatchers(HttpMethod.GET, "/v2/professionals").hasAnyRole("ADMIN", "USER")
@@ -69,7 +70,7 @@
                             .requestMatchers(HttpMethod.GET, "/v2/professionals/{id}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/v2/professionals").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/v2/professionals").hasRole("ADMIN")
-                            .requestMatchers(HttpMethod.DELETE, "/v2/professionals").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/v2/professionals/{id}").hasRole("ADMIN")
 
                             // PROFILE
                             .requestMatchers(HttpMethod.GET, "/v2/profiles").hasAnyRole("ADMIN", "USER")
@@ -85,7 +86,7 @@
                             .requestMatchers(HttpMethod.GET, "/v2/services/{id}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/v2/services").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/v2/services").hasRole("ADMIN")
-                            .requestMatchers(HttpMethod.DELETE, "/v2/services").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/v2/services/{id}").hasRole("ADMIN")
 
                             // USERS
                             .requestMatchers(HttpMethod.POST, "/v2/users/login").permitAll()

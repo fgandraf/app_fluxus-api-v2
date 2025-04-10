@@ -84,7 +84,7 @@ public class Order
 
     public String coordinates;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "status")
     public Status status;
 
     @Column(name = "pending_date")
@@ -95,8 +95,6 @@ public class Order
 
     @Column(name = "done_date")
     public LocalDate doneDate;
-
-    public String comments;
 
     public Boolean invoiced;
 
@@ -110,7 +108,7 @@ public class Order
         return invoice != null ? invoice.getId() : null;
     }
 
-    public Order(Long id, String referenceCode, Branch branch, LocalDate orderDate, LocalDate deadline, Professional professional, Service service, Double serviceAmount, Double mileageAllowance, Boolean siopi, String customerName, String city, String contactName, String contactPhone, String coordinates, Status status, LocalDate pendingDate, LocalDate surveyDate, LocalDate doneDate, String comments, Boolean invoiced, Invoice invoice) {
+    public Order(Long id, String referenceCode, Branch branch, LocalDate orderDate, LocalDate deadline, Professional professional, Service service, Double serviceAmount, Double mileageAllowance, Boolean siopi, String customerName, String city, String contactName, String contactPhone, String coordinates, Status status, LocalDate pendingDate, LocalDate surveyDate, LocalDate doneDate, Boolean invoiced, Invoice invoice) {
         this.id = id;
         this.referenceCode = referenceCode;
         this.branch = branch;
@@ -130,7 +128,6 @@ public class Order
         this.pendingDate = pendingDate;
         this.surveyDate = surveyDate;
         this.doneDate = doneDate;
-        this.comments = comments;
         this.invoiced = invoiced;
         this.invoice = invoice;
     }

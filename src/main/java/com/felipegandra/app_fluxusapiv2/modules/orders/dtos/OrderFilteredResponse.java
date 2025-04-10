@@ -13,6 +13,6 @@ public record OrderFilteredResponse(
         String customerName,
         LocalDate surveyDate,
         LocalDate doneDate,
-        Boolean invoiced
+        boolean invoiced
 ) {
 }

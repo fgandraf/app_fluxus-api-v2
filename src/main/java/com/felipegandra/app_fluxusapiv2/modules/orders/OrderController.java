@@ -45,10 +45,10 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/filtered/{filter}")
+    @GetMapping("/filtered")
     @Operation(summary = "Obter todas as ordens de serviço filtradas", description = "Retorna todas as ordens de serviços com filtro.")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<OrderFilteredResponse>> getFiltered(@PathVariable String filter) {
+    public ResponseEntity<List<OrderFilteredResponse>> getFiltered(@Valid @RequestBody OrderFilterRequest filter) {
         List<OrderFilteredResponse> response = service.getOrdersFiltered(filter);
         return ResponseEntity.ok(response);
     }

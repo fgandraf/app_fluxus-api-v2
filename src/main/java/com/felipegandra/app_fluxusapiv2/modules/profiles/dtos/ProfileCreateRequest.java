@@ -76,6 +76,7 @@ public record ProfileCreateRequest(
 
         LocalDate contractEstablished,
         LocalDate contractStart,
-        LocalDate contractEnd
+        LocalDate contractEnd,
+        String logo
 ) {
 }

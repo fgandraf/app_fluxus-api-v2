@@ -2,6 +2,7 @@ package com.felipegandra.app_fluxusapiv2.modules.orders;
 
 import com.felipegandra.app_fluxusapiv2.exceptions.*;
 import com.felipegandra.app_fluxusapiv2.modules.branches.BranchRepository;
+import com.felipegandra.app_fluxusapiv2.modules.invoices.Invoice;
 import com.felipegandra.app_fluxusapiv2.modules.invoices.InvoiceRepository;
 import com.felipegandra.app_fluxusapiv2.modules.orders.dtos.*;
 import com.felipegandra.app_fluxusapiv2.modules.orders.enums.Status;
@@ -10,7 +11,6 @@ import com.felipegandra.app_fluxusapiv2.modules.services.ServiceRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +44,14 @@ public class OrderService {
                 var city = (String) result[3];
                 var referenceCode = ((String) result[4]).substring(9, 18).replaceFirst("^0+(?!$)", "");
                 var customerName = (String) result[5];
-                var deadline = ((Timestamp) result[6]).toLocalDateTime().toLocalDate();
+                var deadline = ((java.sql.Date) result[6]).toLocalDate();
                 var tag = (String) result[7];
 
-                var card = new String[3];
-                card[0] = tag + "-" + city + "-" + referenceCode;
-                card[1] = customerName;
-                card[2] = "- Prazo: " + deadline.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                var title = tag + "-" + city + "-" + referenceCode + "\n" +
+                        customerName + "\n" +
+                        "- Prazo: " + deadline.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-                orders.add(new OrderFlowResponse(id, card,status,professionalId));
+                orders.add(new OrderFlowResponse(id, title, status, professionalId));
             });
 
             return orders;
@@ -82,14 +81,14 @@ public class OrderService {
         try {
             resultsRaw.forEach(result -> {
                 var id = (Long) result[0];
-                var orderDate = ((Timestamp) result[1]).toLocalDateTime().toLocalDate();
+                var orderDate = ((java.sql.Date) result[1]).toLocalDate();
                 var referenceCode = (String) result[2];
                 var professional = (String) result[3];
                 var service = (String) result[4];
                 var city = (String) result[5];
                 var customerName = (String) result[6];
-                var surveyDate = ((Timestamp) result[7]).toLocalDateTime().toLocalDate();
-                var doneDate = ((Timestamp) result[8]).toLocalDateTime().toLocalDate();
+                var surveyDate = ((java.sql.Date) result[7]).toLocalDate();
+                var doneDate = ((java.sql.Date) result[8]).toLocalDate();
                 var serviceAmount = ((BigDecimal) result[9]).doubleValue();
                 var mileageAllowance = ((BigDecimal) result[10]).doubleValue();
 
@@ -117,31 +116,31 @@ public class OrderService {
         }
     }
 
-    public List<OrderFilteredResponse> getOrdersFiltered(String filter){
+    public List<OrderFilteredResponse> getOrdersFiltered(OrderFilterRequest filter){
         List<OrderFilteredResponse> orders = new ArrayList<>();
 
         try {
-            var filters = filter.split(",");
-            var professional = filters[0];
-            var service = filters[1];
-            var city = filters[2];
-            var status = Integer.parseInt(filters[3]);
-            var invoiced = Integer.parseInt(filters[4]);
-
-            var resultsRaw = orderRepository.findFiltered(professional, service, city, status, invoiced).orElseThrow(() -> new NoRecordsFoundException());
+            var resultsRaw = orderRepository.findFiltered(
+                    filter.professionalTag(),
+                    filter.serviceTag(),
+                    filter.city(),
+                    filter.status(),
+                    filter.invoiced()
+                    )
+                    .orElseThrow(() -> new NoRecordsFoundException());
 
             resultsRaw.forEach(result -> {
                 var idResult = (Long) result[0];
                 var statusResult = (int) result[1];
                 var professionalResult = (String) result[2];
-                var orderDateResult = ((Timestamp) result[3]).toLocalDateTime().toLocalDate();
+                var orderDateResult = ((java.sql.Date) result[3]).toLocalDate();
                 var referenceCodeResult = (String) result[4];
                 var serviceResult = (String) result[5];
                 var cityResult = (String) result[6];
                 var customerNameResult = (String) result[7];
-                var surveyDateResult = ((Timestamp) result[8]).toLocalDateTime().toLocalDate();
-                var doneDateResult = ((Timestamp) result[9]).toLocalDateTime().toLocalDate();
-                var invoicedResult = (int) result[10];
+                var surveyDateResult = ((java.sql.Date) result[8]).toLocalDate();
+                var doneDateResult = ((java.sql.Date) result[9]).toLocalDate();
+                var invoicedResult = (boolean) result[10];
 
                 orders.add(new OrderFilteredResponse(
                                 idResult,
@@ -154,13 +153,13 @@ public class OrderService {
                                 customerNameResult,
                                 surveyDateResult,
                                 doneDateResult,
-                                invoicedResult > 0
+                                invoicedResult
                         )
                 );
             });
 
         } catch (Exception ex) {
-            throw new DatabaseOperationException("Erro inesperado.", ex);
+            throw new DatabaseOperationException("Erro inesperado." + ex, ex);
         }
 
         return orders;
@@ -173,15 +172,15 @@ public class OrderService {
         try {
             resultsRaw.forEach(result -> {
                 var id = (Long) result[0];
-                var orderDate = ((Timestamp) result[1]).toLocalDateTime().toLocalDate();
+                var orderDate = ((java.sql.Date) result[1]).toLocalDate();
                 var referenceCode = (String) result[2];
                 var professionalId = (Long) result[3];
                 var professional = (String) result[4];
                 var service = (String) result[5];
                 var city = (String) result[6];
                 var customerName = (String) result[7];
-                var surveyDate = ((Timestamp) result[8]).toLocalDateTime().toLocalDate();
-                var doneDate = ((Timestamp) result[9]).toLocalDateTime().toLocalDate();
+                var surveyDate = ((java.sql.Date) result[8]).toLocalDate();
+                var doneDate = ((java.sql.Date) result[9]).toLocalDate();
                 var invoiceIdResult = (Long) result[10];
                 var serviceAmount = ((BigDecimal) result[11]).doubleValue();
                 var mileageAllowance = ((BigDecimal) result[12]).doubleValue();
@@ -270,7 +269,6 @@ public class OrderService {
                     request.pendingDate(),
                     request.surveyDate(),
                     request.doneDate(),
-                    request.comments(),
                     false,
                     null
             );
@@ -290,7 +288,11 @@ public class OrderService {
         var branch = branchRepository.findById(request.branchId()).orElseThrow(() -> new BranchNotFoundException(request.branchId()));
         var service = serviceRepository.findById(request.serviceId()).orElseThrow(() -> new ServiceNotFoundException(request.professionalId()));
         var professional = professionalRepository.findById(request.professionalId()).orElseThrow(() -> new ProfessionalNotFoundException(request.professionalId()));
-        var invoice = invoiceRepository.findById(request.invoiceId()).orElseThrow(() -> new InvoiceNotFoundException(request.invoiceId()));
+        Invoice invoice = new Invoice();
+
+        if (request.invoiceId() != 0){
+            invoice = invoiceRepository.findById(request.invoiceId()).orElseThrow(() -> new InvoiceNotFoundException(request.invoiceId()));
+        }
 
         try {
             order.setReferenceCode(request.referenceCode());
@@ -312,7 +314,9 @@ public class OrderService {
             order.setSurveyDate(request.surveyDate());
             order.setDoneDate(request.doneDate());
             order.setInvoiced(request.invoiced());
-            order.setInvoice(invoice);
+            if (invoice.getId() != null){
+                order.setInvoice(invoice);
+            }
 
             var savedOrder = orderRepository.save(order);
             return new OrderResponse(savedOrder);

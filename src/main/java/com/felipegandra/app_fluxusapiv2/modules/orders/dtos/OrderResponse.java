@@ -23,7 +23,8 @@ public record OrderResponse(
         LocalDate pendingDate,
         LocalDate surveyDate,
         LocalDate doneDate,
-        String comments
+        Long invoiceId,
+        Boolean invoiced
 ) {
 
     public OrderResponse(Order order) {
@@ -47,7 +48,8 @@ public record OrderResponse(
                 order.getPendingDate(),
                 order.getSurveyDate(),
                 order.getDoneDate(),
-                order.getComments()
+                order.getInvoiceId(),
+                order.getInvoiced()
         );
     }
 }
