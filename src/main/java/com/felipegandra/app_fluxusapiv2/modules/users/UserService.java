@@ -70,7 +70,10 @@ public class UserService implements UserDetailsService {
         try {
             var user = new User(
                     request.email(),
-                    new BCryptPasswordEncoder().encode(request.password())
+                    new BCryptPasswordEncoder().encode(request.password()),
+                    request.professionalId(),
+                    request.technicianResponsible(),
+                    request.legalResponsible()
             );
 
             var savedUser = repository.save(user);
@@ -88,7 +91,9 @@ public class UserService implements UserDetailsService {
 
         try{
             user.setEmail(request.email());
-            user.setPassword(new BCryptPasswordEncoder().encode(request.password()));
+            if (request.password() != null) {
+                user.setPassword(new BCryptPasswordEncoder().encode(request.password()));
+            }
 
             var savedUser = repository.save(user);
             return new UserResponse(savedUser);

@@ -22,7 +22,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "FROM tbl_order ord " +
             "INNER JOIN tbl_service ser ON ser.SERVICE_ID = ord.SERVICE_ID " +
             "INNER JOIN tbl_professional pro ON ord.PROFESSIONAL_ID = pro.PROFESSIONAL_ID " +
-            "WHERE ord.INVOICED = 0 AND ord.STATUS = 3 " +
+            "WHERE ord.INVOICED = 0 AND ord.STATUS = 4 " +
             "ORDER BY ord.ORDER_DATE", nativeQuery = true)
     Optional<List<Object[]>> findDoneToInvoice();
 

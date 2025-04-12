@@ -1,9 +1,6 @@
 package com.felipegandra.app_fluxusapiv2.modules.branches;
 
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchCreateRequest;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchIndexResponse;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchResponse;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchUpdateRequest;
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -44,8 +41,8 @@ public class BranchController {
     @GetMapping("contacts/{branchId}")
     @Operation(summary = "Obter contatos da agência por Id", description = "Retorna as informações de contato de uma agência pelo seu identificador único.")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<BranchResponse> getDetailsById(@PathVariable String branchId) {
-        BranchResponse response =  service.getBranchDetailsById(branchId);
+    public ResponseEntity<BranchIndexResponse> getDetailsById(@PathVariable String branchId) {
+        var response =  service.getBranchDetailsById(branchId);
         return ResponseEntity.ok(response);
     }
 

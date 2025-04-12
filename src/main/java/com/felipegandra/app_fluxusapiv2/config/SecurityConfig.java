@@ -61,6 +61,7 @@
                             .requestMatchers(HttpMethod.GET, "/v2/orders/{id}").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/v2/orders").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.PUT, "/v2/orders/update-status/{orderId},{status}").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.PUT, "/v2/orders/update-invoice/{invoiceId}").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/v2/orders").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.DELETE, "/v2/orders/{id}").hasAnyRole("ADMIN", "USER")
 

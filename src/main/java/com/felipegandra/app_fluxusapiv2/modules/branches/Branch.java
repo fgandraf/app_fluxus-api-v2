@@ -61,6 +61,14 @@ public class Branch {
         this.email = email;
     }
 
+    public Branch(String id, String name, String city, String phone1, String email) {
+        this.id = id;
+        this.name = name;
+        this.city = city;
+        this.phone1 = phone1;
+        this.email = email;
+    }
+
 
     public Branch(Branch branch) {
         this(

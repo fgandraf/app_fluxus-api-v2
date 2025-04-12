@@ -2,10 +2,7 @@ package com.felipegandra.app_fluxusapiv2.modules.branches;
 
 import com.felipegandra.app_fluxusapiv2.exceptions.BranchNotFoundException;
 import com.felipegandra.app_fluxusapiv2.exceptions.DatabaseOperationException;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchCreateRequest;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchIndexResponse;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchResponse;
-import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.BranchUpdateRequest;
+import com.felipegandra.app_fluxusapiv2.modules.branches.dtos.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -42,7 +39,6 @@ public class BranchService {
         } catch (Exception ex) {
             throw new DatabaseOperationException("Erro inesperado.", ex);
         }
-
     }
 
     public BranchResponse findById(String id) {
@@ -50,16 +46,16 @@ public class BranchService {
         return new BranchResponse(branch);
     }
 
-    public BranchResponse getBranchDetailsById(String branchId) {
-        var branch = repository.findBranchDetailsById(branchId).orElseThrow(() -> new BranchNotFoundException(branchId));
-        return new BranchResponse(branch);
+    public BranchIndexResponse getBranchDetailsById(String branchId) {
+        var branch = repository.findById(branchId).orElseThrow(() -> new BranchNotFoundException(branchId));
+        return new BranchIndexResponse(branch);
     }
 
     public BranchResponse create(BranchCreateRequest request) {
 
         try{
             var branch = new Branch(
-                    null,
+                    request.id(),
                     request.name(),
                     request.address(),
                     request.complement(),

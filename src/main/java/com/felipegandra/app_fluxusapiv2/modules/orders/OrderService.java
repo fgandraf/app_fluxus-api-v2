@@ -329,14 +329,23 @@ public class OrderService {
     }
 
     public void updateToInvoice(Long invoiceId, List<Long> orders){
-        var invoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
+        var invoice = new Invoice();
+        if (invoiceId != 0){
+            invoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
+        }
 
         try{
             for(var item : orders){
                 var order = orderRepository.findById(item).orElseThrow(() -> new OrderNotFoundException(item));
 
-                order.setInvoice(invoice);
-                order.setInvoiced(true);
+                if (invoice.getId() != null){
+                    order.setInvoice(invoice);
+                    order.setInvoiced(true);
+                }
+                else {
+                    order.setInvoice(null);
+                    order.setInvoiced(false);
+                }
 
                 orderRepository.save(order);
             }

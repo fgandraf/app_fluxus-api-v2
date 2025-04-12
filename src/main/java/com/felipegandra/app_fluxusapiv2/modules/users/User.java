@@ -79,9 +79,14 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public User(String email, String password) {
+    public User(String email, String password, Long professionalId, Boolean technicianResponsible, Boolean legalResponsible) {
         this.email = email;
         this.password = password;
+        this.professionalId = professionalId;
+        this.active = true;
+        this.technicianResponsible = technicianResponsible;
+        this.legalResponsible = legalResponsible;
+        this.role = UserRole.USER;
     }
 
     public User() {}

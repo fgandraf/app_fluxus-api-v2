@@ -5,6 +5,10 @@ import jakarta.validation.constraints.Size;
 
 public record BranchCreateRequest(
 
+        @NotNull(message = "Id is required.")
+        @Size(min = 1, max = 4, message = "Id must be between 1 and 4 characters.")
+        String id,
+
         @NotNull(message = "Name is required.")
         @Size(min = 1, max = 100, message = "Name must be between 1 and 100 characters.")
         String name,
