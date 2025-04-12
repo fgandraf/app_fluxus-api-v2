@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 
@@ -38,10 +39,12 @@ public class ProfileService {
     }
 
     public void updateProfileLogo(ProfileUpdateLogoRequest request) {
-        try{
+        try {
             var fileContent = Base64.getDecoder().decode(request.base64Image());
-            Files.write(Paths.get("src/main/resources/static/logo.png"), fileContent);
-        }catch (IOException e){
+            Path logoPath = Paths.get("src/main/resources/static/logo.png");
+            Files.createDirectories(logoPath.getParent());
+            Files.write(logoPath, fileContent);
+        } catch (IOException e) {
             throw new ProfileLogoNotWrittenException();
         } catch (Exception ex) {
             throw new DatabaseOperationException("Erro inesperado.", ex);
